@@ -7,7 +7,13 @@ const MineSquare = () => {
   const inputRefQuantity = useRef<HTMLInputElement>(null);
 
   const [matrix, setMatrix] = useState<Array<Array<number>>>(
-    Array(6).fill(Array(6).fill(0))
+    Array.from({ length: 6 }, (x) => new Array(6).fill(0))
+  );
+  const [logicMatrix, setLogicMatrix] = useState<Array<Array<number>>>(
+    Array.from({ length: 6 }, (x) => new Array(6).fill(null))
+  );
+  const [maskingMatrix, setMaskingMatrix] = useState<Array<Array<string>>>(
+    Array.from({ length: 6 }, (x) => new Array(6).fill(null))
   );
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
@@ -26,6 +32,13 @@ const MineSquare = () => {
     let tempMatrix: Array<Array<number>> = Array.from(
       { length: inputColumn },
       (x) => new Array(inputRow).fill(0)
+    );
+
+    setLogicMatrix(
+      Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
+    );
+    setMaskingMatrix(
+      Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
     );
 
     // Exemplo de matriz:
@@ -67,17 +80,17 @@ const MineSquare = () => {
       //    +1     7    +1
       //    +1]   +1]   +1]
 
-      for (let i = -1; i < 2; i++) {
-        let arrayRow: Array<number> = tempMatrix[columnIndex + i];
+      for (let x = -1; x < 2; x++) {
+        let arrayRow: Array<number> = tempMatrix[columnIndex + x];
 
         if (arrayRow) {
           mineIndexes.forEach((mineIndex) => {
-            for (let i = -1; i < 2; i++) {
+            for (let y = -1; y < 2; y++) {
               if (
-                arrayRow[mineIndex + i] !== undefined &&
-                arrayRow[mineIndex + i] !== 7
+                arrayRow[mineIndex + y] !== undefined &&
+                arrayRow[mineIndex + y] !== 7
               )
-                arrayRow[mineIndex + i]++;
+                arrayRow[mineIndex + y]++;
             }
           });
         }
@@ -87,20 +100,87 @@ const MineSquare = () => {
     setMatrix(tempMatrix);
   };
 
+  function showHideButtonClick(button: React.MouseEvent<HTMLButtonElement>) {
+    let coordinates: Array<number> = button.currentTarget.id
+      .split(" ")
+      .map((stringValue) => parseInt(stringValue));
+
+    findNearEmptyFields(coordinates);
+
+    setLogicMatrix([...logicMatrix]);
+
+    setMaskingMatrix(
+      logicMatrix.map((column) =>
+        column.map((field) => {
+          if (field === 8) return "";
+          else if (field === 7) return "8";
+          else if (field === null) {
+            return 'x';
+          }
+          else {
+            return field.toString();
+          }
+        })
+      )
+    );
+  }
+
+  function findNearEmptyFields(coordinates: Array<number>) {
+    if (true) {
+      logicMatrix[coordinates[0]][coordinates[1]] =
+        matrix[coordinates[0]][coordinates[1]];
+
+      // Apenas se o field clicado não tem dicas ou bomba, que então são expostos os fields em volta
+      if (matrix[coordinates[0]][coordinates[1]] === 0) {
+        // for dentro de for para verificar os 8 fields em volta do lugar clicado
+        for (let x = -1; x < 2; x++) {
+          for (let y = -1; y < 2; y++) {
+            // seta o lugar clicado (coodenada 0, 0 a partir do lugar clicado) para 8 (assim eu sei que em volta deste field já foi verificado)
+            if (x === 0 && y === 0) {
+              logicMatrix[coordinates[0] + x][coordinates[1] + y] = 8;
+            } else {
+              // if para validar se em volta deste field é o final da matriz, ou se já foi verificado (8)
+              if (
+                matrix[coordinates[0] + x] !== undefined &&
+                matrix[coordinates[0] + x][coordinates[1] + y] !== undefined &&
+                logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 8
+              ) {
+                // Mostra os valores em volta do field
+                logicMatrix[coordinates[0] + x][coordinates[1] + y] =
+                  matrix[coordinates[0] + x][coordinates[1] + y];
+
+                // Se o valor exposto em volta é 0 (que significa sem dica ou bomba), essa mesma função é chamada
+                if (matrix[coordinates[0] + x][coordinates[1] + y] === 0) {
+                  findNearEmptyFields([coordinates[0] + x, coordinates[1] + y]);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   return (
     <>
       Coluna
-      <input ref={inputRefColumn} type="number" />
+      <input ref={inputRefColumn} defaultValue={10} type="number" />
       Linhas
-      <input ref={inputRefRow} type="number" />
+      <input ref={inputRefRow} defaultValue={10} type="number" />
       Bombas (%)
-      <input ref={inputRefQuantity} type="number" />
+      <input ref={inputRefQuantity} defaultValue={20} type="number" />
       <button onClick={handleChange}>-</button>
       <S.SquareDiv>
-        {matrix.map((content, index) => (
-          <S.ColumnDiv key={Math.random()}>
-            {matrix[index].map((number) => (
-              <S.MineButton key={Math.random()}>{number}</S.MineButton>
+        {maskingMatrix.map((content, indexColumn) => (
+          <S.ColumnDiv key={indexColumn}>
+            {maskingMatrix[indexColumn].map((number, indexRow) => (
+              <S.MineButton
+                key={`${indexColumn} ${indexRow}`}
+                id={`${indexColumn} ${indexRow}`}
+                onClick={(button) => showHideButtonClick(button)}
+              >
+                {number}
+              </S.MineButton>
             ))}
           </S.ColumnDiv>
         ))}
