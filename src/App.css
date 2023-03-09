@@ -1,6 +1,11 @@
-.App {
+div {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  font-weight: bolder;
 }

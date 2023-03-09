@@ -6,6 +6,9 @@ const MineSquare = () => {
   const inputRefColumn = useRef<HTMLInputElement>(null);
   const inputRefQuantity = useRef<HTMLInputElement>(null);
 
+  const [onlyMinesMatrix, setOnlyMinesMatrixx] = useState<Array<Array<number>>>(
+    Array.from({ length: 6 }, (x) => new Array(6).fill(0))
+  );
   const [matrix, setMatrix] = useState<Array<Array<number>>>(
     Array.from({ length: 6 }, (x) => new Array(6).fill(0))
   );
@@ -38,7 +41,7 @@ const MineSquare = () => {
       Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
     );
     setMaskingMatrix(
-      Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
+      Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(" "))
     );
 
     // Exemplo de matriz:
@@ -63,6 +66,10 @@ const MineSquare = () => {
 
       tempMatrix[columnCoordinate][rowCoordinate] = 9;
     }
+
+    setOnlyMinesMatrixx(
+      tempMatrix.map((column) => column.map((content) => content))
+    );
 
     // Faz uma verificação por coluna para colocar as dicas de onde estão as mines
     tempMatrix.forEach((currentArrayColumn, columnIndex) => {
@@ -160,16 +167,77 @@ const MineSquare = () => {
 
   return (
     <>
-      Coluna
-      <input ref={inputRefColumn} defaultValue={10} type="number" />
-      Linhas
-      <input ref={inputRefRow} defaultValue={10} type="number" />
-      Bombas (%)
-      <input ref={inputRefQuantity} defaultValue={20} type="number" />
-      <button onClick={createMinesweeper}>-</button>
+      <S.MenuWrapperDiv>
+        <S.MenuItemDiv>
+          <S.Label htmlFor="columns">Colunas</S.Label>
+          <S.InputNumber
+            ref={inputRefColumn}
+            name="column"
+            defaultValue={6}
+            type="number"
+          />
+        </S.MenuItemDiv>
+        <S.MenuItemDiv>
+          <S.Label htmlFor="row">Linhas</S.Label>
+          <S.InputNumber
+            ref={inputRefRow}
+            name="rows"
+            defaultValue={6}
+            type="number"
+          />
+        </S.MenuItemDiv>
+        <S.MenuItemDiv>
+          <S.Label htmlFor="mines">Minas (%)</S.Label>
+          <S.InputNumber
+            ref={inputRefQuantity}
+            name="mines"
+            defaultValue={15}
+            type="number"
+          />
+        </S.MenuItemDiv>
+      </S.MenuWrapperDiv>
+      <S.Button onClick={createMinesweeper}>Gerar Campominado</S.Button>
+      <S.MatrixWrapperDiv>
+        Jogo:
+        <S.WrapperDiv margin="10px">
+          {maskingMatrix.map((content, indexColumn) => (
+            <S.ColumnDiv key={indexColumn}>
+              {maskingMatrix[indexColumn].map((content, indexRow) => (
+                <S.MineButton
+                  onMouseEnter={() => console.log("tesstess")}
+                  key={`${indexColumn} ${indexRow}`}
+                  id={`${indexColumn} ${indexRow}`}
+                  backgroundColor={content === " " ? true : false}
+                  onClick={(button) => fieldClick(button)}
+                >
+                  {content}
+                </S.MineButton>
+              ))}
+            </S.ColumnDiv>
+          ))}
+        </S.WrapperDiv>
+      </S.MatrixWrapperDiv>
       <S.WrapperDiv margin="0px">
-        <div>
-          Matriz gerada:
+        <S.MatrixWrapperDiv>
+          Matriz com minas (9):
+          <S.WrapperDiv margin="10px">
+            {onlyMinesMatrix.map((content, indexColumn) => (
+              <S.ColumnDiv key={indexColumn}>
+                {onlyMinesMatrix[indexColumn].map((content, indexRow) => (
+                  <S.MineButton
+                    key={`${indexColumn} ${indexRow}`}
+                    id={`${indexColumn} ${indexRow}`}
+                    backgroundColor={true}
+                  >
+                    {content}
+                  </S.MineButton>
+                ))}
+              </S.ColumnDiv>
+            ))}
+          </S.WrapperDiv>
+        </S.MatrixWrapperDiv>
+        <S.MatrixWrapperDiv>
+          Matriz com dicas (1~8):
           <S.WrapperDiv margin="10px">
             {matrix.map((content, indexColumn) => (
               <S.ColumnDiv key={indexColumn}>
@@ -185,8 +253,8 @@ const MineSquare = () => {
               </S.ColumnDiv>
             ))}
           </S.WrapperDiv>
-        </div>
-        <div>
+        </S.MatrixWrapperDiv>
+        <S.MatrixWrapperDiv>
           Lógica (10 = entorno verificado)
           <S.WrapperDiv margin="10px">
             {logicMatrix.map((content, indexColumn) => (
@@ -203,26 +271,7 @@ const MineSquare = () => {
               </S.ColumnDiv>
             ))}
           </S.WrapperDiv>
-        </div>
-        <div>
-          Jogo:
-          <S.WrapperDiv margin="10px">
-            {maskingMatrix.map((content, indexColumn) => (
-              <S.ColumnDiv key={indexColumn}>
-                {maskingMatrix[indexColumn].map((content, indexRow) => (
-                  <S.MineButton
-                    key={`${indexColumn} ${indexRow}`}
-                    id={`${indexColumn} ${indexRow}`}
-                    backgroundColor={content === " " ? true : false}
-                    onClick={(button) => fieldClick(button)}
-                  >
-                    {content}
-                  </S.MineButton>
-                ))}
-              </S.ColumnDiv>
-            ))}
-          </S.WrapperDiv>
-        </div>
+        </S.MatrixWrapperDiv>
       </S.WrapperDiv>
     </>
   );
