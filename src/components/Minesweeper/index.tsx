@@ -120,7 +120,7 @@ const MineSquare = () => {
       logicMatrix.map((column) =>
         column.map((field) => {
           if (field === 10) return "";
-          else if (field === 9) return "B";
+          else if (field === 9) return "M";
           else if (field === null) {
             return " ";
           } else {
@@ -196,7 +196,7 @@ const MineSquare = () => {
           />
         </S.MenuItemDiv>
       </S.MenuWrapperDiv>
-      <S.Button onClick={createMinesweeper}>Gerar Campominado</S.Button>
+      <S.Button onClick={createMinesweeper}>Gerar Campo Minado</S.Button>
       <S.MatrixWrapperDiv>
         Jogo:
         <S.WrapperDiv margin="10px">
@@ -207,7 +207,7 @@ const MineSquare = () => {
                   onMouseEnter={() => console.log("tesstess")}
                   key={`${indexColumn} ${indexRow}`}
                   id={`${indexColumn} ${indexRow}`}
-                  backgroundColor={content === " " ? true : false}
+                  content={content}
                   onClick={(button) => fieldClick(button)}
                 >
                   {content}
@@ -227,7 +227,7 @@ const MineSquare = () => {
                   <S.MineButton
                     key={`${indexColumn} ${indexRow}`}
                     id={`${indexColumn} ${indexRow}`}
-                    backgroundColor={true}
+                    content={" "}
                   >
                     {content}
                   </S.MineButton>
@@ -245,7 +245,7 @@ const MineSquare = () => {
                   <S.MineButton
                     key={`${indexColumn} ${indexRow}`}
                     id={`${indexColumn} ${indexRow}`}
-                    backgroundColor={true}
+                    content={" "}
                   >
                     {content}
                   </S.MineButton>
@@ -263,7 +263,7 @@ const MineSquare = () => {
                   <S.MineButton
                     key={`${indexColumn} ${indexRow}`}
                     id={`${indexColumn} ${indexRow}`}
-                    backgroundColor={true}
+                    content={" "}
                   >
                     {content}
                   </S.MineButton>
