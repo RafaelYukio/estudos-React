@@ -1,11 +1,11 @@
 import "./App.css";
-import MineSquare from "./components/MineSquare";
+import Minesweeper from "./components/Minesweeper";
 
 function App() {
   return (
     <div className="App">
       <h1>aaaaaaa AAAAAA</h1>
-      <MineSquare />
+      <Minesweeper />
     </div>
   );
 }

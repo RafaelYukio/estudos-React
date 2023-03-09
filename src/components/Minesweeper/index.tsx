@@ -18,7 +18,7 @@ const MineSquare = () => {
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
 
-  const handleChange = () => {
+  const createMinesweeper = () => {
     // Recebe valores dos inputs
     let inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
     let inputRow: number = parseInt(inputRefRow.current?.value || "0");
@@ -100,7 +100,7 @@ const MineSquare = () => {
     setMatrix(tempMatrix);
   };
 
-  function showHideButtonClick(button: React.MouseEvent<HTMLButtonElement>) {
+  function fieldClick(button: React.MouseEvent<HTMLButtonElement>) {
     let coordinates: Array<number> = button.currentTarget.id
       .split(" ")
       .map((stringValue) => parseInt(stringValue));
@@ -113,11 +113,10 @@ const MineSquare = () => {
       logicMatrix.map((column) =>
         column.map((field) => {
           if (field === 8) return "";
-          else if (field === 7) return "8";
+          else if (field === 7) return "B";
           else if (field === null) {
-            return 'x';
-          }
-          else {
+            return ".";
+          } else {
             return field.toString();
           }
         })
@@ -126,33 +125,31 @@ const MineSquare = () => {
   }
 
   function findNearEmptyFields(coordinates: Array<number>) {
-    if (true) {
-      logicMatrix[coordinates[0]][coordinates[1]] =
-        matrix[coordinates[0]][coordinates[1]];
+    logicMatrix[coordinates[0]][coordinates[1]] =
+      matrix[coordinates[0]][coordinates[1]];
 
-      // Apenas se o field clicado não tem dicas ou bomba, que então são expostos os fields em volta
-      if (matrix[coordinates[0]][coordinates[1]] === 0) {
-        // for dentro de for para verificar os 8 fields em volta do lugar clicado
-        for (let x = -1; x < 2; x++) {
-          for (let y = -1; y < 2; y++) {
-            // seta o lugar clicado (coodenada 0, 0 a partir do lugar clicado) para 8 (assim eu sei que em volta deste field já foi verificado)
-            if (x === 0 && y === 0) {
-              logicMatrix[coordinates[0] + x][coordinates[1] + y] = 8;
-            } else {
-              // if para validar se em volta deste field é o final da matriz, ou se já foi verificado (8)
-              if (
-                matrix[coordinates[0] + x] !== undefined &&
-                matrix[coordinates[0] + x][coordinates[1] + y] !== undefined &&
-                logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 8
-              ) {
-                // Mostra os valores em volta do field
-                logicMatrix[coordinates[0] + x][coordinates[1] + y] =
-                  matrix[coordinates[0] + x][coordinates[1] + y];
+    // Apenas se o field clicado não tem dicas ou bomba, que então são expostos os fields em volta
+    if (matrix[coordinates[0]][coordinates[1]] === 0) {
+      // for dentro de for para verificar os 8 fields em volta do lugar clicado
+      for (let x = -1; x < 2; x++) {
+        for (let y = -1; y < 2; y++) {
+          // seta o lugar clicado (coodenada 0, 0 a partir do lugar clicado) para 8 (assim eu sei que em volta deste field já foi verificado)
+          if (x === 0 && y === 0) {
+            logicMatrix[coordinates[0] + x][coordinates[1] + y] = 8;
+          } else {
+            // if para validar se em volta deste field é o final da matriz, ou se já foi verificado (8)
+            if (
+              matrix[coordinates[0] + x] !== undefined &&
+              matrix[coordinates[0] + x][coordinates[1] + y] !== undefined &&
+              logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 8
+            ) {
+              // Mostra os valores em volta do field
+              logicMatrix[coordinates[0] + x][coordinates[1] + y] =
+                matrix[coordinates[0] + x][coordinates[1] + y];
 
-                // Se o valor exposto em volta é 0 (que significa sem dica ou bomba), essa mesma função é chamada
-                if (matrix[coordinates[0] + x][coordinates[1] + y] === 0) {
-                  findNearEmptyFields([coordinates[0] + x, coordinates[1] + y]);
-                }
+              // Se o valor exposto em volta é 0 (que significa sem dica ou bomba), essa mesma função é chamada
+              if (matrix[coordinates[0] + x][coordinates[1] + y] === 0) {
+                findNearEmptyFields([coordinates[0] + x, coordinates[1] + y]);
               }
             }
           }
@@ -169,17 +166,18 @@ const MineSquare = () => {
       <input ref={inputRefRow} defaultValue={10} type="number" />
       Bombas (%)
       <input ref={inputRefQuantity} defaultValue={20} type="number" />
-      <button onClick={handleChange}>-</button>
+      <button onClick={createMinesweeper}>-</button>
       <S.SquareDiv>
         {maskingMatrix.map((content, indexColumn) => (
           <S.ColumnDiv key={indexColumn}>
-            {maskingMatrix[indexColumn].map((number, indexRow) => (
+            {maskingMatrix[indexColumn].map((content, indexRow) => (
               <S.MineButton
                 key={`${indexColumn} ${indexRow}`}
                 id={`${indexColumn} ${indexRow}`}
-                onClick={(button) => showHideButtonClick(button)}
+                backgroundColor={content === '.' ? true : false}
+                onClick={(button) => fieldClick(button)}
               >
-                {number}
+                {content}
               </S.MineButton>
             ))}
           </S.ColumnDiv>
