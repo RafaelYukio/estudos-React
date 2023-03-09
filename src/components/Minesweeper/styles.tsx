@@ -1,11 +1,11 @@
 import styled from "styled-components";
 
-export const SquareDiv = styled.div`
+export const WrapperDiv = styled.div<{ margin: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  color: ${(props) => props.color || "#fff"};
+  margin: ${props => props.margin || '0'}
 `;
 
 export const ColumnDiv = styled.div``;
@@ -21,5 +21,6 @@ export const MineButton = styled.button<{ backgroundColor: boolean }>`
   border: solid #f2f2f2 1px;
   border-radius: ${(props) => (props.backgroundColor ? "2px" : "7px")};
   background-color: ${(props) => (props.backgroundColor ? "F9F9F9" : "white")};
-  box-shadow: 0 0 7px 4px ${(props) => (props.backgroundColor ? "#ECECEC" : "#F9F9F9")} inset;
+  box-shadow: 0 0 7px 4px
+    ${(props) => (props.backgroundColor ? "#ECECEC" : "#F9F9F9")} inset;
 `;

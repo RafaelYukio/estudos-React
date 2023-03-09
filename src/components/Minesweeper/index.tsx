@@ -56,20 +56,20 @@ const MineSquare = () => {
     );
 
     // Coloca mines em lugares aleatórios da matriz
-    // O local da mine terá o número 7
+    // O local da mine terá o número 9
     for (let i: number = 0; i < mineQuantity; i++) {
       let columnCoordinate: number = getRandomInt(inputColumn);
       let rowCoordinate: number = getRandomInt(inputRow);
 
-      tempMatrix[columnCoordinate][rowCoordinate] = 7;
+      tempMatrix[columnCoordinate][rowCoordinate] = 9;
     }
 
     // Faz uma verificação por coluna para colocar as dicas de onde estão as mines
-    tempMatrix.forEach((currentArrayRow, columnIndex) => {
+    tempMatrix.forEach((currentArrayColumn, columnIndex) => {
       // Encontra os indexes das mines desta coluna
-      let mineIndexes: Array<number> = currentArrayRow.reduce(
+      let mineIndexes: Array<number> = currentArrayColumn.reduce(
         (accumulator, currentValue, currentIndex) => {
-          if (currentValue === 7) accumulator.push(currentIndex);
+          if (currentValue === 9) accumulator.push(currentIndex);
           return accumulator;
         },
         new Array<number>()
@@ -77,20 +77,20 @@ const MineSquare = () => {
 
       // Adiciona +1 em volta de cada mine desta coluna
       // [ [+1 , [+1 , [+1 ]
-      //    +1     7    +1
+      //    +1     9    +1
       //    +1]   +1]   +1]
 
       for (let x = -1; x < 2; x++) {
-        let arrayRow: Array<number> = tempMatrix[columnIndex + x];
+        let arrayColumn: Array<number> = tempMatrix[columnIndex + x];
 
-        if (arrayRow) {
+        if (arrayColumn) {
           mineIndexes.forEach((mineIndex) => {
             for (let y = -1; y < 2; y++) {
               if (
-                arrayRow[mineIndex + y] !== undefined &&
-                arrayRow[mineIndex + y] !== 7
+                arrayColumn[mineIndex + y] !== undefined &&
+                arrayColumn[mineIndex + y] !== 9
               )
-                arrayRow[mineIndex + y]++;
+                arrayColumn[mineIndex + y]++;
             }
           });
         }
@@ -112,10 +112,10 @@ const MineSquare = () => {
     setMaskingMatrix(
       logicMatrix.map((column) =>
         column.map((field) => {
-          if (field === 8) return "";
-          else if (field === 7) return "B";
+          if (field === 10) return "";
+          else if (field === 9) return "B";
           else if (field === null) {
-            return ".";
+            return " ";
           } else {
             return field.toString();
           }
@@ -133,15 +133,15 @@ const MineSquare = () => {
       // for dentro de for para verificar os 8 fields em volta do lugar clicado
       for (let x = -1; x < 2; x++) {
         for (let y = -1; y < 2; y++) {
-          // seta o lugar clicado (coodenada 0, 0 a partir do lugar clicado) para 8 (assim eu sei que em volta deste field já foi verificado)
+          // seta o lugar clicado (coodenada 0, 0 a partir do lugar clicado) para 10 (assim eu sei que em volta deste field já foi verificado)
           if (x === 0 && y === 0) {
-            logicMatrix[coordinates[0] + x][coordinates[1] + y] = 8;
+            logicMatrix[coordinates[0] + x][coordinates[1] + y] = 10;
           } else {
-            // if para validar se em volta deste field é o final da matriz, ou se já foi verificado (8)
+            // if para validar se em volta deste field é o final da matriz, ou se já foi verificado (10)
             if (
               matrix[coordinates[0] + x] !== undefined &&
               matrix[coordinates[0] + x][coordinates[1] + y] !== undefined &&
-              logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 8
+              logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 10
             ) {
               // Mostra os valores em volta do field
               logicMatrix[coordinates[0] + x][coordinates[1] + y] =
@@ -167,22 +167,63 @@ const MineSquare = () => {
       Bombas (%)
       <input ref={inputRefQuantity} defaultValue={20} type="number" />
       <button onClick={createMinesweeper}>-</button>
-      <S.SquareDiv>
-        {maskingMatrix.map((content, indexColumn) => (
-          <S.ColumnDiv key={indexColumn}>
-            {maskingMatrix[indexColumn].map((content, indexRow) => (
-              <S.MineButton
-                key={`${indexColumn} ${indexRow}`}
-                id={`${indexColumn} ${indexRow}`}
-                backgroundColor={content === '.' ? true : false}
-                onClick={(button) => fieldClick(button)}
-              >
-                {content}
-              </S.MineButton>
+      <S.WrapperDiv margin="0px">
+        <div>
+          Matriz gerada:
+          <S.WrapperDiv margin="10px">
+            {matrix.map((content, indexColumn) => (
+              <S.ColumnDiv key={indexColumn}>
+                {matrix[indexColumn].map((content, indexRow) => (
+                  <S.MineButton
+                    key={`${indexColumn} ${indexRow}`}
+                    id={`${indexColumn} ${indexRow}`}
+                    backgroundColor={true}
+                  >
+                    {content}
+                  </S.MineButton>
+                ))}
+              </S.ColumnDiv>
             ))}
-          </S.ColumnDiv>
-        ))}
-      </S.SquareDiv>
+          </S.WrapperDiv>
+        </div>
+        <div>
+          Lógica (10 = entorno verificado)
+          <S.WrapperDiv margin="10px">
+            {logicMatrix.map((content, indexColumn) => (
+              <S.ColumnDiv key={indexColumn}>
+                {logicMatrix[indexColumn].map((content, indexRow) => (
+                  <S.MineButton
+                    key={`${indexColumn} ${indexRow}`}
+                    id={`${indexColumn} ${indexRow}`}
+                    backgroundColor={true}
+                  >
+                    {content}
+                  </S.MineButton>
+                ))}
+              </S.ColumnDiv>
+            ))}
+          </S.WrapperDiv>
+        </div>
+        <div>
+          Jogo:
+          <S.WrapperDiv margin="10px">
+            {maskingMatrix.map((content, indexColumn) => (
+              <S.ColumnDiv key={indexColumn}>
+                {maskingMatrix[indexColumn].map((content, indexRow) => (
+                  <S.MineButton
+                    key={`${indexColumn} ${indexRow}`}
+                    id={`${indexColumn} ${indexRow}`}
+                    backgroundColor={content === " " ? true : false}
+                    onClick={(button) => fieldClick(button)}
+                  >
+                    {content}
+                  </S.MineButton>
+                ))}
+              </S.ColumnDiv>
+            ))}
+          </S.WrapperDiv>
+        </div>
+      </S.WrapperDiv>
     </>
   );
 };
