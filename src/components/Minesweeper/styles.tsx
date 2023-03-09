@@ -62,7 +62,7 @@ export const MineButton = styled.button<{ content: string }>`
   box-shadow: 0 0 7px 4px ${(props) => changeShadowBoxColor(props.content)}
     inset;
   &:hover {
-    filter: brightness(98%);
+    filter: brightness(98%) !important;
   }
 `;
 

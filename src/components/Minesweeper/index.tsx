@@ -2,10 +2,25 @@ import { useRef, useState } from "react";
 import * as S from "./styles";
 
 const MineSquare = () => {
-  const inputRefRow = useRef<HTMLInputElement>(null);
-  const inputRefColumn = useRef<HTMLInputElement>(null);
-  const inputRefQuantity = useRef<HTMLInputElement>(null);
+  // Referências dos inputs para poder coletar os valores
+  const inputRefRow: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
+  const inputRefColumn: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
+  const inputRefQuantity: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
 
+  // Interface para poder criar objeto com keys e valores dinâmicos
+  interface fieldRefs {
+    [key: string]: any;
+  }
+
+  // Objeto com a referência de cada campo de cada matriz (key = coordenada 'c0r0' e value = referência do botão)
+  let onlyMinesMatrixRefs: fieldRefs = {};
+  let matrixRefs: fieldRefs = {};
+  let logicMatrixRefs: fieldRefs = {};
+
+  // Matrizes que serão renderizadas
   const [onlyMinesMatrix, setOnlyMinesMatrixx] = useState<Array<Array<number>>>(
     Array.from({ length: 6 }, (x) => new Array(6).fill(0))
   );
@@ -21,6 +36,7 @@ const MineSquare = () => {
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
 
+  // Função executada para criar o jogo (matrizes)
   const createMinesweeper = () => {
     // Recebe valores dos inputs
     let inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
@@ -107,12 +123,9 @@ const MineSquare = () => {
     setMatrix(tempMatrix);
   };
 
+  // Função para que a matriz de máscara seja atualizada conforme campo clicado
   function fieldClick(button: React.MouseEvent<HTMLButtonElement>) {
-    let coordinates: Array<number> = button.currentTarget.id
-      .split(" ")
-      .map((stringValue) => parseInt(stringValue));
-
-    findNearEmptyFields(coordinates);
+    findNearEmptyFields(getCoordinatesById(button, "mm "));
 
     setLogicMatrix([...logicMatrix]);
 
@@ -131,6 +144,7 @@ const MineSquare = () => {
     );
   }
 
+  // Função para que sejam descobertos os campos em volta do lugar clicado (função recursiva para que desencadeie a descoberta de todos os campos sem dicas ou minas adjacentes)
   function findNearEmptyFields(coordinates: Array<number>) {
     logicMatrix[coordinates[0]][coordinates[1]] =
       matrix[coordinates[0]][coordinates[1]];
@@ -164,6 +178,35 @@ const MineSquare = () => {
       }
     }
   }
+
+  // Função para destacar o campo em que o mouse está, em todas as matrizes
+  // É verificado o local do mouse e então pego a referência correspondente de cada matriz pelo array de refs. criado
+
+  function highlighField(
+    button: React.MouseEvent<HTMLButtonElement>,
+    brightness: string
+  ) {
+    let coordinates: Array<number> = getCoordinatesById(button, "mm ");
+
+    onlyMinesMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
+      brightness;
+    matrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
+      brightness;
+    logicMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
+      brightness;
+  }
+
+  // Função para pegar coordenadas do campo clicado pelo id
+  // *Verificar melhor forma de armazenar dados em um componente e depois verificar
+  const getCoordinatesById = (
+    button: React.MouseEvent<HTMLButtonElement>,
+    idPattern: string
+  ): Array<number> => {
+    return button.currentTarget.id
+      .replace(idPattern, "")
+      .split(" ")
+      .map((stringValue) => parseInt(stringValue));
+  };
 
   return (
     <>
@@ -204,9 +247,14 @@ const MineSquare = () => {
             <S.ColumnDiv key={indexColumn}>
               {maskingMatrix[indexColumn].map((content, indexRow) => (
                 <S.MineButton
-                  onMouseEnter={() => console.log("tesstess")}
-                  key={`${indexColumn} ${indexRow}`}
-                  id={`${indexColumn} ${indexRow}`}
+                  onMouseEnter={(button) =>
+                    highlighField(button, "brightness(90%)")
+                  }
+                  onMouseLeave={(button) =>
+                    highlighField(button, "brightness(100%)")
+                  }
+                  key={`mm ${indexColumn} ${indexRow}`}
+                  id={`mm ${indexColumn} ${indexRow}`}
                   content={content}
                   onClick={(button) => fieldClick(button)}
                 >
@@ -225,8 +273,11 @@ const MineSquare = () => {
               <S.ColumnDiv key={indexColumn}>
                 {onlyMinesMatrix[indexColumn].map((content, indexRow) => (
                   <S.MineButton
-                    key={`${indexColumn} ${indexRow}`}
-                    id={`${indexColumn} ${indexRow}`}
+                    key={`omm ${indexColumn} ${indexRow}`}
+                    id={`omm ${indexColumn} ${indexRow}`}
+                    ref={(ref) =>
+                      (onlyMinesMatrixRefs[`c${indexColumn}r${indexRow}`] = ref)
+                    }
                     content={" "}
                   >
                     {content}
@@ -243,8 +294,11 @@ const MineSquare = () => {
               <S.ColumnDiv key={indexColumn}>
                 {matrix[indexColumn].map((content, indexRow) => (
                   <S.MineButton
-                    key={`${indexColumn} ${indexRow}`}
-                    id={`${indexColumn} ${indexRow}`}
+                    key={`m ${indexColumn} ${indexRow}`}
+                    id={`m ${indexColumn} ${indexRow}`}
+                    ref={(ref) =>
+                      (matrixRefs[`c${indexColumn}r${indexRow}`] = ref)
+                    }
                     content={" "}
                   >
                     {content}
@@ -261,8 +315,11 @@ const MineSquare = () => {
               <S.ColumnDiv key={indexColumn}>
                 {logicMatrix[indexColumn].map((content, indexRow) => (
                   <S.MineButton
-                    key={`${indexColumn} ${indexRow}`}
-                    id={`${indexColumn} ${indexRow}`}
+                    key={`lm ${indexColumn} ${indexRow}`}
+                    id={`lm ${indexColumn} ${indexRow}`}
+                    ref={(ref) =>
+                      (logicMatrixRefs[`c${indexColumn}r${indexRow}`] = ref)
+                    }
                     content={" "}
                   >
                     {content}
