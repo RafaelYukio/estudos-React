@@ -16,9 +16,9 @@ const MineSquare = () => {
   }
 
   // Objeto com a referência de cada campo de cada matriz (key = coordenada 'c0r0' e value = referência do botão)
-  let onlyMinesMatrixRefs: fieldRefs = {};
-  let matrixRefs: fieldRefs = {};
-  let logicMatrixRefs: fieldRefs = {};
+  const onlyMinesMatrixRefs: fieldRefs = {};
+  const matrixRefs: fieldRefs = {};
+  const logicMatrixRefs: fieldRefs = {};
 
   // Matrizes que serão renderizadas
   const [onlyMinesMatrix, setOnlyMinesMatrixx] = useState<Array<Array<number>>>(
@@ -32,6 +32,14 @@ const MineSquare = () => {
   );
   const [maskingMatrix, setMaskingMatrix] = useState<Array<Array<string>>>(
     Array.from({ length: 6 }, (x) => new Array(6).fill(null))
+  );
+
+  let mineIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
+    new Array<Array<number>>()
+  );
+
+  let flagIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
+    new Array<Array<number>>()
   );
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
@@ -59,6 +67,8 @@ const MineSquare = () => {
     setMaskingMatrix(
       Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(" "))
     );
+    mineIndexes.current = new Array<Array<number>>();
+    flagIndexes.current = new Array<Array<number>>();
 
     // Exemplo de matriz:
 
@@ -90,13 +100,15 @@ const MineSquare = () => {
     // Faz uma verificação por coluna para colocar as dicas de onde estão as mines
     tempMatrix.forEach((currentArrayColumn, columnIndex) => {
       // Encontra os indexes das mines desta coluna
-      let mineIndexes: Array<number> = currentArrayColumn.reduce(
+      let mineColumnIndexes: Array<number> = currentArrayColumn.reduce(
         (accumulator, currentValue, currentIndex) => {
           if (currentValue === 9) accumulator.push(currentIndex);
           return accumulator;
         },
         new Array<number>()
       );
+
+      mineIndexes.current.push(mineColumnIndexes);
 
       // Adiciona +1 em volta de cada mine desta coluna
       // [ [+1 , [+1 , [+1 ]
@@ -107,13 +119,13 @@ const MineSquare = () => {
         let arrayColumn: Array<number> = tempMatrix[columnIndex + x];
 
         if (arrayColumn) {
-          mineIndexes.forEach((mineIndex) => {
+          mineColumnIndexes.forEach((mineColumnIndexes) => {
             for (let y = -1; y < 2; y++) {
               if (
-                arrayColumn[mineIndex + y] !== undefined &&
-                arrayColumn[mineIndex + y] !== 9
+                arrayColumn[mineColumnIndexes + y] !== undefined &&
+                arrayColumn[mineColumnIndexes + y] !== 9
               )
-                arrayColumn[mineIndex + y]++;
+                arrayColumn[mineColumnIndexes + y]++;
             }
           });
         }
@@ -129,20 +141,89 @@ const MineSquare = () => {
 
     setLogicMatrix([...logicMatrix]);
 
-    setMaskingMatrix(
-      logicMatrix.map((column) =>
-        column.map((field) => {
-          if (field === 10) return "";
-          else if (field === 9) return "M";
-          else if (field === null) {
-            return " ";
-          } else {
-            return field.toString();
-          }
-        })
-      )
+    let logicToMaskingMatrix = logicMatrix.map((column) =>
+      column.map((field) => {
+        if (field === 10) return "";
+        else if (field === 9) return "M";
+        else if (field === null) {
+          return " ";
+        } else {
+          return field.toString();
+        }
+      })
     );
+
+    flagIndexes.current.forEach((currentArrayColumn, columnIndex) => {
+      currentArrayColumn.forEach((flagIndex) => {
+        logicToMaskingMatrix[columnIndex][flagIndex] = "F";
+      });
+    });
+
+    setMaskingMatrix(logicToMaskingMatrix);
+
+    checkVictory(logicToMaskingMatrix);
   }
+
+  function fieldRightClick(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) {
+    event.preventDefault();
+    let coordinate = getCoordinatesById(event, "mm ");
+    if (maskingMatrix[coordinate[0]][coordinate[1]] === "F")
+      maskingMatrix[coordinate[0]][coordinate[1]] = " ";
+    else if (maskingMatrix[coordinate[0]][coordinate[1]] === " ")
+      maskingMatrix[coordinate[0]][coordinate[1]] = "F";
+
+    setMaskingMatrix([...maskingMatrix]);
+
+    flagIndexes.current = findIndexes(maskingMatrix, "F");
+
+    checkVictory(maskingMatrix);
+  }
+
+  function checkVictory(logicToMaskingMatrix: Array<Array<string>>) {
+    let undiscoveredFields: Array<Array<number>> = findIndexes(
+      logicToMaskingMatrix,
+      " "
+    );
+
+    let anyUndiscoveredField: boolean = false;
+
+    undiscoveredFields.forEach((column) =>
+      column.forEach((content) => {
+        if (content || content === 0) anyUndiscoveredField = true;
+      })
+    );
+    if (
+      JSON.stringify(mineIndexes.current) ===
+        JSON.stringify(flagIndexes.current) &&
+      !anyUndiscoveredField
+    )
+      alert("Vocês ganhou!");
+  }
+
+  // Procurar sobre função genérica, onde posso passar uma array de um tipo e procurar pelo mesmo
+  const findIndexes = (
+    matrix: Array<Array<string>>,
+    toFind: string
+  ): Array<Array<number>> => {
+    let indexes: Array<Array<number>> = new Array<Array<number>>();
+
+    matrix.forEach((currentArrayColumn) => {
+      // Encontra os indexes das flags
+      let columnIndexes = currentArrayColumn.reduce(
+        (accumulator, currentValue, currentIndex) => {
+          if (currentValue === toFind) accumulator.push(currentIndex);
+          return accumulator;
+        },
+        new Array<number>()
+      );
+
+      indexes.push(columnIndexes);
+    });
+
+    return indexes;
+  };
 
   // Função para que sejam descobertos os campos em volta do lugar clicado (função recursiva para que desencadeie a descoberta de todos os campos sem dicas ou minas adjacentes)
   function findNearEmptyFields(coordinates: Array<number>) {
@@ -253,6 +334,8 @@ const MineSquare = () => {
                   onMouseLeave={(button) =>
                     highlighField(button, "brightness(100%)")
                   }
+                  // onMouseDown={(event) => fieldRightClick(event)}
+                  onContextMenu={(event) => fieldRightClick(event)}
                   key={`mm ${indexColumn} ${indexRow}`}
                   id={`mm ${indexColumn} ${indexRow}`}
                   content={content}

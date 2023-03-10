@@ -32,6 +32,7 @@ export const Button = styled.button`
   box-shadow: 0 0 7px 7px #f9f9f9;
   border-radius: 14px;
   background-color: #ececec;
+  cursor: pointer;
   &:hover {
     background-color: #dadada;
   }
@@ -88,6 +89,8 @@ const changeBackgroundColor = (content: string): string => {
       return "#F1F1F1";
     case "M":
       return "#FFF3C5";
+    case "F":
+      return "#D6C5FF";
     default:
       return "white";
   }
@@ -99,6 +102,8 @@ const changeShadowBoxColor = (content: string): string => {
       return "#ECECEC";
     case "M":
       return "#FFF3C5";
+    case "F":
+      return "#D6C5FF";
     default:
       return "#F9F9F9";
   }
