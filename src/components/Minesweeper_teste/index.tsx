@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as S from "./styles";
 
-const MineSquare = () => {
+const Minesweeper_teste = (): JSX.Element => {
   // Referências dos inputs para poder coletar os valores
   const inputRefRow: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
@@ -9,6 +9,14 @@ const MineSquare = () => {
     useRef<HTMLInputElement>(null);
   const inputRefQuantity: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
+
+  // Gera campo minado na primeira renderização
+  // https://www.w3schools.com/react/react_useeffect.asp
+  // Exemplo do useEffect com useState:
+  // https://www.w3schools.com/react/showreact.asp?filename=demo2_react_useeffect_settimeout3
+  useEffect(() => {
+    createMinesweeper();
+  }, []);
 
   // Interface para poder criar objeto com keys e valores dinâmicos
   interface fieldRefs {
@@ -45,7 +53,7 @@ const MineSquare = () => {
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
 
   // Função executada para criar o jogo (matrizes)
-  const createMinesweeper = () => {
+  const createMinesweeper = (): void => {
     // Recebe valores dos inputs
     let inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
     let inputRow: number = parseInt(inputRefRow.current?.value || "0");
@@ -136,7 +144,7 @@ const MineSquare = () => {
   };
 
   // Função para que a matriz de máscara seja atualizada conforme campo clicado
-  function fieldClick(button: React.MouseEvent<HTMLButtonElement>) {
+  function fieldClick(button: React.MouseEvent<HTMLButtonElement>): void {
     findNearEmptyFields(getCoordinatesById(button, "mm "));
 
     setLogicMatrix([...logicMatrix]);
@@ -166,7 +174,7 @@ const MineSquare = () => {
 
   function fieldRightClick(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) {
+  ): void {
     event.preventDefault();
     let coordinate = getCoordinatesById(event, "mm ");
     if (maskingMatrix[coordinate[0]][coordinate[1]] === "F")
@@ -181,7 +189,7 @@ const MineSquare = () => {
     checkVictory(maskingMatrix);
   }
 
-  function checkVictory(logicToMaskingMatrix: Array<Array<string>>) {
+  function checkVictory(logicToMaskingMatrix: Array<Array<string>>): void {
     let undiscoveredFields: Array<Array<number>> = findIndexes(
       logicToMaskingMatrix,
       " "
@@ -199,7 +207,7 @@ const MineSquare = () => {
         JSON.stringify(flagIndexes.current) &&
       !anyUndiscoveredField
     )
-      alert("Vocês ganhou!");
+      alert("Você ganhou!");
   }
 
   // Procurar sobre função genérica, onde posso passar uma array de um tipo e procurar pelo mesmo
@@ -226,7 +234,7 @@ const MineSquare = () => {
   };
 
   // Função para que sejam descobertos os campos em volta do lugar clicado (função recursiva para que desencadeie a descoberta de todos os campos sem dicas ou minas adjacentes)
-  function findNearEmptyFields(coordinates: Array<number>) {
+  function findNearEmptyFields(coordinates: Array<number>): void {
     logicMatrix[coordinates[0]][coordinates[1]] =
       matrix[coordinates[0]][coordinates[1]];
 
@@ -266,7 +274,7 @@ const MineSquare = () => {
   function highlighField(
     button: React.MouseEvent<HTMLButtonElement>,
     brightness: string
-  ) {
+  ): void {
     let coordinates: Array<number> = getCoordinatesById(button, "mm ");
 
     onlyMinesMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
@@ -326,7 +334,7 @@ const MineSquare = () => {
         <S.WrapperDiv margin="10px">
           {maskingMatrix.map((content, indexColumn) => (
             <S.ColumnDiv key={indexColumn}>
-              {maskingMatrix[indexColumn].map((content, indexRow) => (
+              {content.map((content, indexRow) => (
                 <S.MineButton
                   onMouseEnter={(button) =>
                     highlighField(button, "brightness(90%)")
@@ -334,7 +342,6 @@ const MineSquare = () => {
                   onMouseLeave={(button) =>
                     highlighField(button, "brightness(100%)")
                   }
-                  // onMouseDown={(event) => fieldRightClick(event)}
                   onContextMenu={(event) => fieldRightClick(event)}
                   key={`mm ${indexColumn} ${indexRow}`}
                   id={`mm ${indexColumn} ${indexRow}`}
@@ -354,7 +361,7 @@ const MineSquare = () => {
           <S.WrapperDiv margin="10px">
             {onlyMinesMatrix.map((content, indexColumn) => (
               <S.ColumnDiv key={indexColumn}>
-                {onlyMinesMatrix[indexColumn].map((content, indexRow) => (
+                {content.map((content, indexRow) => (
                   <S.MineButton
                     key={`omm ${indexColumn} ${indexRow}`}
                     id={`omm ${indexColumn} ${indexRow}`}
@@ -375,7 +382,7 @@ const MineSquare = () => {
           <S.WrapperDiv margin="10px">
             {matrix.map((content, indexColumn) => (
               <S.ColumnDiv key={indexColumn}>
-                {matrix[indexColumn].map((content, indexRow) => (
+                {content.map((content, indexRow) => (
                   <S.MineButton
                     key={`m ${indexColumn} ${indexRow}`}
                     id={`m ${indexColumn} ${indexRow}`}
@@ -396,7 +403,7 @@ const MineSquare = () => {
           <S.WrapperDiv margin="10px">
             {logicMatrix.map((content, indexColumn) => (
               <S.ColumnDiv key={indexColumn}>
-                {logicMatrix[indexColumn].map((content, indexRow) => (
+                {content.map((content, indexRow) => (
                   <S.MineButton
                     key={`lm ${indexColumn} ${indexRow}`}
                     id={`lm ${indexColumn} ${indexRow}`}
@@ -417,4 +424,4 @@ const MineSquare = () => {
   );
 };
 
-export default MineSquare;
+export default Minesweeper_teste;
