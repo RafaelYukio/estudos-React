@@ -210,20 +210,18 @@ const Minesweeper = (): JSX.Element => {
     flagIndexes.current = findIndexes(maskingMatrix, "F");
   }
 
-  const checkEnd = (maskingMatrix: Array<Array<string>>): boolean => {
-    console.log("chequei");
-
+  let checkEnd = (maskingMatrix: Array<Array<string>>): boolean => {
     const clickedMineField: Array<Array<number>> = findIndexes(
       maskingMatrix,
       "M"
     );
-
+    
     // Tutorial para uso do every:
     // https://masteringjs.io/tutorials/fundamentals/foreach-break
     if (
       !clickedMineField.every((column) =>
         column.every((content) => {
-          return content ? false : true;
+          return content || content === 0 ? false : true;
         })
       )
     ) {
