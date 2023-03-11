@@ -1,24 +1,34 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Button from "../../components/Button";
 import DivMatrixMines from "../../components/DivMatrixMines";
-import InputMine from "../../components/InputMine";
+import InputNumberMine from "../../components/InputNumberMine";
+import Modal from "../../components/Modal";
 import * as S from "./styles";
 
 const Minesweeper = (): JSX.Element => {
-  // Use callback para que ao componente pai renderizar, ele não passar de novo funções desnecessáriamente
+  // Use callback para que, ao componente pai renderizar, ele não passe de novo funções desnecessáriamente
   // https://www.w3schools.com/react/react_usecallback.asp
-  const teste = useCallback(() => {}, []);
 
   useEffect(() => {
-    createMinesweeper();
+    generateMinesweeper();
   }, []);
 
-  interface fieldRefs {
+  interface FieldRefs {
     [key: string]: any;
   }
 
-  const onlyMinesMatrixRefs: fieldRefs = useRef<fieldRefs>({});
-  const matrixRefs: fieldRefs = useRef<fieldRefs>({});
-  const logicMatrixRefs: fieldRefs = useRef<fieldRefs>({});
+  interface FieldHighlighProp {
+    function: (
+      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      css: string
+    ) => void;
+    cssOnMouseEnter: string;
+    cssOnMouseLeave: string;
+  }
+
+  const onlyMinesMatrixRefs: FieldRefs = useRef<FieldRefs>({});
+  const matrixRefs: FieldRefs = useRef<FieldRefs>({});
+  const logicMatrixRefs: FieldRefs = useRef<FieldRefs>({});
 
   const inputRefRow: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
@@ -40,20 +50,61 @@ const Minesweeper = (): JSX.Element => {
     Array.from({ length: 6 }, (x) => new Array(6).fill(null))
   );
 
-  let mineIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
+  const mineIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
     new Array<Array<number>>()
   );
 
-  let flagIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
+  const flagIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
     new Array<Array<number>>()
   );
+
+  const fieldHighlightProps: FieldHighlighProp = {
+    function: fieldHighlight,
+    cssOnMouseEnter: "brightness(90%)",
+    cssOnMouseLeave: "none",
+  };
+
+  const [modalNotOpened, setModalNotOpened] = useState<boolean>(true);
+
+  let modalMessage: string = "Você ganhou!";
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
 
-  const createMinesweeper = (): void => {
-    let inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
-    let inputRow: number = parseInt(inputRefRow.current?.value || "0");
-    let inputQuantityPercentage: number = parseInt(
+  const getCoordinatesById = (
+    button: React.MouseEvent<HTMLButtonElement>,
+    idPattern: string
+  ): Array<number> => {
+    return button.currentTarget.id
+      .replace(idPattern, "")
+      .split(" ")
+      .map((stringValue) => parseInt(stringValue));
+  };
+
+  const findIndexes = (
+    matrix: Array<Array<string>>,
+    toFind: string
+  ): Array<Array<number>> => {
+    let indexes: Array<Array<number>> = new Array<Array<number>>();
+
+    matrix.forEach((currentArrayColumn) => {
+      let columnIndexes = currentArrayColumn.reduce(
+        (accumulator, currentValue, currentIndex) => {
+          if (currentValue === toFind) accumulator.push(currentIndex);
+          return accumulator;
+        },
+        new Array<number>()
+      );
+
+      indexes.push(columnIndexes);
+    });
+
+    return indexes;
+  };
+
+  const generateMinesweeper = useCallback(() => {
+    const inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
+    const inputRow: number = parseInt(inputRefRow.current?.value || "0");
+    const inputQuantityPercentage: number = parseInt(
       inputRefQuantity.current?.value || "0"
     );
 
@@ -62,6 +113,7 @@ const Minesweeper = (): JSX.Element => {
       (x) => new Array(inputRow).fill(0)
     );
 
+    setModalNotOpened(true);
     setLogicMatrix(
       Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
     );
@@ -71,7 +123,7 @@ const Minesweeper = (): JSX.Element => {
     mineIndexes.current = new Array<Array<number>>();
     flagIndexes.current = new Array<Array<number>>();
 
-    let mineQuantity: number = Math.floor(
+    const mineQuantity: number = Math.floor(
       inputColumn * inputRow * (inputQuantityPercentage / 100)
     );
 
@@ -115,7 +167,7 @@ const Minesweeper = (): JSX.Element => {
     });
 
     setMatrix(tempMatrix);
-  };
+  }, []);
 
   function fieldLeftClick(button: React.MouseEvent<HTMLButtonElement>): void {
     findNearEmptyFields(getCoordinatesById(button, "mm "));
@@ -141,8 +193,6 @@ const Minesweeper = (): JSX.Element => {
     });
 
     setMaskingMatrix(logicToMaskingMatrix);
-
-    checkVictory(logicToMaskingMatrix);
   }
 
   function fieldRightClick(
@@ -158,50 +208,47 @@ const Minesweeper = (): JSX.Element => {
     setMaskingMatrix([...maskingMatrix]);
 
     flagIndexes.current = findIndexes(maskingMatrix, "F");
-
-    checkVictory(maskingMatrix);
   }
 
-  function checkVictory(logicToMaskingMatrix: Array<Array<string>>): void {
-    let undiscoveredFields: Array<Array<number>> = findIndexes(
-      logicToMaskingMatrix,
+  const checkEnd = (maskingMatrix: Array<Array<string>>): boolean => {
+    console.log("chequei");
+
+    const clickedMineField: Array<Array<number>> = findIndexes(
+      maskingMatrix,
+      "M"
+    );
+
+    // Tutorial para uso do every:
+    // https://masteringjs.io/tutorials/fundamentals/foreach-break
+    if (
+      !clickedMineField.every((column) =>
+        column.every((content) => {
+          return content ? false : true;
+        })
+      )
+    ) {
+      modalMessage = "Você perdeu!";
+      return true;
+    }
+
+    const undiscoveredFields: Array<Array<number>> = findIndexes(
+      maskingMatrix,
       " "
     );
 
-    let anyUndiscoveredField: boolean = false;
-
-    undiscoveredFields.forEach((column) =>
-      column.forEach((content) => {
-        if (content || content === 0) anyUndiscoveredField = true;
+    let anyUndiscoveredField: boolean = !undiscoveredFields.every((column) =>
+      column.every((content) => {
+        return content || content === 0 ? false : true;
       })
     );
+
     if (
       JSON.stringify(mineIndexes.current) ===
         JSON.stringify(flagIndexes.current) &&
       !anyUndiscoveredField
     )
-      alert("Você ganhou!");
-  }
-
-  const findIndexes = (
-    matrix: Array<Array<string>>,
-    toFind: string
-  ): Array<Array<number>> => {
-    let indexes: Array<Array<number>> = new Array<Array<number>>();
-
-    matrix.forEach((currentArrayColumn) => {
-      let columnIndexes = currentArrayColumn.reduce(
-        (accumulator, currentValue, currentIndex) => {
-          if (currentValue === toFind) accumulator.push(currentIndex);
-          return accumulator;
-        },
-        new Array<number>()
-      );
-
-      indexes.push(columnIndexes);
-    });
-
-    return indexes;
+      return true;
+    else return false;
   };
 
   function findNearEmptyFields(coordinates: Array<number>): void {
@@ -232,7 +279,7 @@ const Minesweeper = (): JSX.Element => {
     }
   }
 
-  function fieldHighligh(
+  function fieldHighlight(
     button: React.MouseEvent<HTMLButtonElement>,
     brightness: string
   ): void {
@@ -246,32 +293,34 @@ const Minesweeper = (): JSX.Element => {
       brightness;
   }
 
-  const getCoordinatesById = (
-    button: React.MouseEvent<HTMLButtonElement>,
-    idPattern: string
-  ): Array<number> => {
-    return button.currentTarget.id
-      .replace(idPattern, "")
-      .split(" ")
-      .map((stringValue) => parseInt(stringValue));
-  };
-
   return (
     <>
+      {checkEnd(maskingMatrix) && modalNotOpened && (
+        <Modal
+          PrimaryButtonOnClick={() => {
+            setModalNotOpened(false);
+          }}
+          Header="Campo Minado"
+          Content={modalMessage}
+        />
+      )}
       <S.WrapperDiv>
-        <InputMine inputRef={inputRefRow} defaultValue={6}>Linhas</InputMine>
-        <InputMine inputRef={inputRefColumn} defaultValue={6}>Colunas</InputMine>
-        <InputMine inputRef={inputRefQuantity} defaultValue={15}>Quantidade (%)</InputMine>
+        <InputNumberMine inputRef={inputRefRow} defaultValue={6}>
+          Linhas
+        </InputNumberMine>
+        <InputNumberMine inputRef={inputRefColumn} defaultValue={6}>
+          Colunas
+        </InputNumberMine>
+        <InputNumberMine inputRef={inputRefQuantity} defaultValue={15}>
+          Quantidade (%)
+        </InputNumberMine>
       </S.WrapperDiv>
-
-      <S.Button onClick={() => createMinesweeper()}>
-        Gerar Campo Minado
-      </S.Button>
+      <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
       <DivMatrixMines
         matrix={maskingMatrix}
         fieldLeftClick={fieldLeftClick}
         fieldRightClick={fieldRightClick}
-        fieldHighligh={fieldHighligh}
+        fieldHighligh={fieldHighlightProps}
       >
         Jogo
       </DivMatrixMines>

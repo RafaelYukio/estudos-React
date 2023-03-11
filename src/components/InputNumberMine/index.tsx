@@ -7,7 +7,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const InputMine = ({
+const InputNumberMine = ({
   inputRef,
   defaultValue,
   children,
@@ -20,4 +20,4 @@ const InputMine = ({
   );
 };
 
-export default React.memo(InputMine);
+export default React.memo(InputNumberMine);

@@ -1,12 +1,19 @@
 import React from "react";
 import * as S from "./styles";
 
-interface fieldRefs {
-  [key: string]: any;
-}
-
 // Implementação de interface para passar props para componentes:
 // https://bobbyhadz.com/blog/react-typescript-pass-function-as-prop
+interface FieldRefs {
+  [key: string]: any;
+}
+interface FieldHighlighProp {
+  function: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    css: string
+  ) => void;
+  cssOnMouseEnter: string;
+  cssOnMouseLeave: string;
+}
 interface DivMatrixMinesProps<T> {
   matrix: Array<Array<T>>;
   fieldLeftClick?: (
@@ -15,11 +22,8 @@ interface DivMatrixMinesProps<T> {
   fieldRightClick?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
-  fieldHighligh?: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    css: string
-  ) => void;
-  matrixRefs?: fieldRefs;
+  fieldHighligh?: FieldHighlighProp;
+  matrixRefs?: FieldRefs;
   children: React.ReactNode;
 }
 
@@ -43,11 +47,11 @@ const DivMatrixMines = <T,>({
               <S.MineButton
                 onMouseEnter={(button) => {
                   if (fieldHighligh !== undefined)
-                    fieldHighligh(button, "brightness(90%)");
+                    fieldHighligh.function(button, fieldHighligh.cssOnMouseEnter);
                 }}
                 onMouseLeave={(button) => {
                   if (fieldHighligh !== undefined)
-                    fieldHighligh(button, "brightness(100%)");
+                    fieldHighligh.function(button, fieldHighligh.cssOnMouseLeave);
                 }}
                 onContextMenu={(event) => {
                   if (fieldRightClick !== undefined) fieldRightClick(event);
