@@ -7,6 +7,6 @@ export const WrapperDiv = styled.div`
   border: none;
   border-radius: 10px;
   box-shadow: 0 0 7px 1px #ececec;
-  background-color: #e6f5ff;
+  background-color: #ececec;
   font-weight: bold;
 `;

@@ -6,7 +6,7 @@ export const WrapperDiv = styled.div`
   margin-top: 7px;
   color: black;
   border-radius: 10px;
-  background-color: #e6f5ff;
+  background-color: #ececec;
   box-shadow: 0 0 7px 1px #ececec;
   flex-direction: row;
   font-size: 24px;

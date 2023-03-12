@@ -1,9 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Button from "../../components/Button";
 import MinesDivMatrix from "../../components/MinesDivMatrix";
 import MinesInputNumber from "../../components/MinesInputNumber";
 import Modal from "../../components/Modal";
 import Page from "../../components/Page";
+import { PageWidth } from "../../context/PageWidth";
 import * as S from "./styles";
 
 const Minesweeper = (): JSX.Element => {
@@ -27,6 +34,10 @@ const Minesweeper = (): JSX.Element => {
     cssOnMouseLeave: string;
   }
 
+  const { pageWidth } = useContext(PageWidth);
+
+  const [zoomMatrix, setZoomMatrix] = useState<string>("1");
+
   const onlyMinesMatrixRefs: FieldRefs = useRef<FieldRefs>({});
   const matrixRefs: FieldRefs = useRef<FieldRefs>({});
   const logicMatrixRefs: FieldRefs = useRef<FieldRefs>({});
@@ -36,6 +47,8 @@ const Minesweeper = (): JSX.Element => {
   const inputRefColumn: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
   const inputRefQuantity: React.RefObject<HTMLInputElement> =
+    useRef<HTMLInputElement>(null);
+  const inputRefZoom: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
 
   const [onlyMinesMatrix, setOnlyMinesMatrix] = useState<Array<Array<number>>>(
@@ -293,7 +306,7 @@ const Minesweeper = (): JSX.Element => {
   }
 
   return (
-    <Page title={"Campo Minado"} description={"100% handmade XD"}>
+    <>
       {checkEnd(maskingMatrix) && modalNotOpened && (
         <Modal
           PrimaryButtonOnClick={() => {
@@ -303,41 +316,58 @@ const Minesweeper = (): JSX.Element => {
           Content={modalMessage}
         />
       )}
-      <S.WrapperDiv>
-        <MinesInputNumber inputRef={inputRefRow} defaultValue={6}>
-          Linhas
-        </MinesInputNumber>
-        <MinesInputNumber inputRef={inputRefColumn} defaultValue={6}>
-          Colunas
-        </MinesInputNumber>
-        <MinesInputNumber inputRef={inputRefQuantity} defaultValue={15}>
-          Quantidade (%)
-        </MinesInputNumber>
-      </S.WrapperDiv>
-      <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
-      <MinesDivMatrix
-        matrix={maskingMatrix}
-        fieldLeftClick={fieldLeftClick}
-        fieldRightClick={fieldRightClick}
-        fieldHighligh={fieldHighlightProps}
+      <Page
+        title={"Campo Minado"}
+        description={"100% handmade XD"}
+        width={pageWidth}
       >
-        Jogo
-      </MinesDivMatrix>
-      <S.WrapperDiv>
-        <MinesDivMatrix
-          matrix={onlyMinesMatrix}
-          matrixRefs={onlyMinesMatrixRefs}
-        >
-          Matriz com minas (9):
-        </MinesDivMatrix>
-        <MinesDivMatrix matrix={matrix} matrixRefs={matrixRefs}>
-          Matriz com dicas (1~8):
-        </MinesDivMatrix>
-        <MinesDivMatrix matrix={logicMatrix} matrixRefs={logicMatrixRefs}>
-          Matriz Lógica (10 = entorno verificado)
-        </MinesDivMatrix>
-      </S.WrapperDiv>
-    </Page>
+        <S.WrapperDiv>
+          <MinesInputNumber inputRef={inputRefRow} defaultValue={6}>
+            Linhas
+          </MinesInputNumber>
+          <MinesInputNumber inputRef={inputRefColumn} defaultValue={6}>
+            Colunas
+          </MinesInputNumber>
+          <MinesInputNumber inputRef={inputRefQuantity} defaultValue={15}>
+            Quantidade (%)
+          </MinesInputNumber>
+          <MinesInputNumber
+            onChange={(event) => {
+              if (event?.target.value)
+                setZoomMatrix((parseInt(event?.target.value) / 100).toString());
+            }}
+            defaultValue={100}
+          >
+            Zoom (%)
+          </MinesInputNumber>
+        </S.WrapperDiv>
+        <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
+        <S.MinesWrapper zoom={zoomMatrix}>
+          <MinesDivMatrix
+            matrix={maskingMatrix}
+            fieldLeftClick={fieldLeftClick}
+            fieldRightClick={fieldRightClick}
+            fieldHighligh={fieldHighlightProps}
+          >
+            Jogo
+          </MinesDivMatrix>
+          <S.WrapperDiv>
+            <MinesDivMatrix
+              matrix={onlyMinesMatrix}
+              matrixRefs={onlyMinesMatrixRefs}
+            >
+              Matriz com minas (9):
+            </MinesDivMatrix>
+            <MinesDivMatrix matrix={matrix} matrixRefs={matrixRefs}>
+              Matriz com dicas (1~8):
+            </MinesDivMatrix>
+            <MinesDivMatrix matrix={logicMatrix} matrixRefs={logicMatrixRefs}>
+              Matriz Lógica (10 = entorno verificado)
+            </MinesDivMatrix>
+          </S.WrapperDiv>
+        </S.MinesWrapper>
+      </Page>
+    </>
   );
 };
 
