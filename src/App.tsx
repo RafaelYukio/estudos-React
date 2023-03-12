@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import { PageWidthContext } from "./contexts/PageWidth";
 import Minesweeper from "./pages/Minesweeper";
 import { IconContext } from "react-icons";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   const [hideLateralMenu, setHideLateralMenu] = useState<boolean>(false);
@@ -32,9 +33,14 @@ function App() {
             hideLateralMenu={hideLateralMenu}
             setHideLateralMenu={setHideLateralMenu}
           />
+
           <Content>
-            <LateralMenu hide={hideLateralMenu} />
-            <Minesweeper />
+            <Router>
+              <LateralMenu hide={hideLateralMenu} />
+              <Routes>
+                <Route path="/" element={<Minesweeper />} />
+              </Routes>
+            </Router>
           </Content>
         </IconContext.Provider>
       </PageWidthContext.Provider>

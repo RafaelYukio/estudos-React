@@ -48,8 +48,6 @@ const Minesweeper = (): JSX.Element => {
     useRef<HTMLInputElement>(null);
   const inputRefQuantity: React.RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
-  const inputRefZoom: React.RefObject<HTMLInputElement> =
-    useRef<HTMLInputElement>(null);
 
   const [onlyMinesMatrix, setOnlyMinesMatrix] = useState<Array<Array<number>>>(
     Array.from({ length: 6 }, (x) => new Array(6).fill(0))
