@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Button from "../../components/Button";
-import DivMatrixMines from "../../components/DivMatrixMines";
-import InputNumberMine from "../../components/InputNumberMine";
+import MinesDivMatrix from "../../components/MinesDivMatrix";
+import MinesInputNumber from "../../components/MinesInputNumber";
 import Modal from "../../components/Modal";
+import Page from "../../components/Page";
 import * as S from "./styles";
 
 const Minesweeper = (): JSX.Element => {
@@ -215,7 +216,7 @@ const Minesweeper = (): JSX.Element => {
       maskingMatrix,
       "M"
     );
-    
+
     // Tutorial para uso do every:
     // https://masteringjs.io/tutorials/fundamentals/foreach-break
     if (
@@ -292,7 +293,7 @@ const Minesweeper = (): JSX.Element => {
   }
 
   return (
-    <>
+    <Page title={"Campo Minado"} description={"100% handmade XD"}>
       {checkEnd(maskingMatrix) && modalNotOpened && (
         <Modal
           PrimaryButtonOnClick={() => {
@@ -303,40 +304,40 @@ const Minesweeper = (): JSX.Element => {
         />
       )}
       <S.WrapperDiv>
-        <InputNumberMine inputRef={inputRefRow} defaultValue={6}>
+        <MinesInputNumber inputRef={inputRefRow} defaultValue={6}>
           Linhas
-        </InputNumberMine>
-        <InputNumberMine inputRef={inputRefColumn} defaultValue={6}>
+        </MinesInputNumber>
+        <MinesInputNumber inputRef={inputRefColumn} defaultValue={6}>
           Colunas
-        </InputNumberMine>
-        <InputNumberMine inputRef={inputRefQuantity} defaultValue={15}>
+        </MinesInputNumber>
+        <MinesInputNumber inputRef={inputRefQuantity} defaultValue={15}>
           Quantidade (%)
-        </InputNumberMine>
+        </MinesInputNumber>
       </S.WrapperDiv>
       <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
-      <DivMatrixMines
+      <MinesDivMatrix
         matrix={maskingMatrix}
         fieldLeftClick={fieldLeftClick}
         fieldRightClick={fieldRightClick}
         fieldHighligh={fieldHighlightProps}
       >
         Jogo
-      </DivMatrixMines>
+      </MinesDivMatrix>
       <S.WrapperDiv>
-        <DivMatrixMines
+        <MinesDivMatrix
           matrix={onlyMinesMatrix}
           matrixRefs={onlyMinesMatrixRefs}
         >
           Matriz com minas (9):
-        </DivMatrixMines>
-        <DivMatrixMines matrix={matrix} matrixRefs={matrixRefs}>
+        </MinesDivMatrix>
+        <MinesDivMatrix matrix={matrix} matrixRefs={matrixRefs}>
           Matriz com dicas (1~8):
-        </DivMatrixMines>
-        <DivMatrixMines matrix={logicMatrix} matrixRefs={logicMatrixRefs}>
+        </MinesDivMatrix>
+        <MinesDivMatrix matrix={logicMatrix} matrixRefs={logicMatrixRefs}>
           Matriz Lógica (10 = entorno verificado)
-        </DivMatrixMines>
+        </MinesDivMatrix>
       </S.WrapperDiv>
-    </>
+    </Page>
   );
 };
 

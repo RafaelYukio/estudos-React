@@ -6,14 +6,17 @@ export const WrapperDiv = styled.div`
 `;
 
 export const MatrixWrapperDiv = styled.div`
+  width: auto;
   margin: 10px;
   padding: 20px;
   box-shadow: 0 0 7px 7px #f9f9f9;
-  border-radius: 5px;
+  border-radius: 7px;
   font-weight: bold;
 `;
 
-export const ColumnDiv = styled.div``;
+export const ColumnDiv = styled.div`
+  width: auto;
+`;
 
 // Com typescript e styled components, é preciso especificar os tipos das props que iremos passar
 // https://stackoverflow.com/questions/52404958/using-styled-components-with-typescript-prop-does-not-exist

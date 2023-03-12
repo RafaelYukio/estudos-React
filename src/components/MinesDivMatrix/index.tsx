@@ -29,7 +29,7 @@ interface DivMatrixMinesProps<T> {
 
 // Função com tipo genérico:
 // https://stackoverflow.com/questions/53958028/how-to-use-generics-in-props-in-react-in-a-functional-component
-const DivMatrixMines = <T,>({
+const MinesDivMatrix = <T,>({
   matrix,
   fieldLeftClick,
   fieldRightClick,
@@ -47,11 +47,17 @@ const DivMatrixMines = <T,>({
               <S.MineButton
                 onMouseEnter={(button) => {
                   if (fieldHighligh !== undefined)
-                    fieldHighligh.function(button, fieldHighligh.cssOnMouseEnter);
+                    fieldHighligh.function(
+                      button,
+                      fieldHighligh.cssOnMouseEnter
+                    );
                 }}
                 onMouseLeave={(button) => {
                   if (fieldHighligh !== undefined)
-                    fieldHighligh.function(button, fieldHighligh.cssOnMouseLeave);
+                    fieldHighligh.function(
+                      button,
+                      fieldHighligh.cssOnMouseLeave
+                    );
                 }}
                 onContextMenu={(event) => {
                   if (fieldRightClick !== undefined) fieldRightClick(event);
@@ -77,4 +83,4 @@ const DivMatrixMines = <T,>({
   );
 };
 
-export default React.memo(DivMatrixMines);
+export default React.memo(MinesDivMatrix);

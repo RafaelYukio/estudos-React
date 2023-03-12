@@ -1,15 +1,24 @@
+import { useState } from "react";
 import "./App.css";
-import Minesweeper_teste from "./components/Minesweeper_teste";
+import Content from "./components/Content";
+import LateralMenu from "./components/LateralMenu";
+import Navbar from "./components/Navbar";
 import Minesweeper from "./pages/Minesweeper";
 
 function App() {
+  const [hideLateralMenu, setHideLateralMenu] = useState<boolean>(false);
+
   return (
-    <div className="App">
-      <h1>Estudos React!</h1>
-      <h2>Jogo de campo minado com tamanho e quantidade de bombas :</h2>
-      {/* <Minesweeper_teste /> */}
-      <Minesweeper />
-    </div>
+    <>
+      <Navbar
+        hideLateralMenu={hideLateralMenu}
+        setHideLateralMenu={setHideLateralMenu}
+      />
+      <Content>
+        <LateralMenu hide={hideLateralMenu} />
+        <Minesweeper />
+      </Content>
+    </>
   );
 }
 

@@ -22,6 +22,7 @@ export const ModalDiv = styled.div`
   border-radius: 50px;
   border: solid #c2c2c2 1px;
   box-shadow: 0 0 20px 3px #c2c2c2;
+  background-color: #f5f5f5;
 `;
 
 export const ModalContentDiv = styled.div`
