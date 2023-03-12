@@ -3,8 +3,9 @@ import "./App.css";
 import Content from "./components/Content";
 import LateralMenu from "./components/LateralMenu";
 import Navbar from "./components/Navbar";
-import { PageWidth } from "./context/PageWidth";
+import { PageWidthContext } from "./contexts/PageWidth";
 import Minesweeper from "./pages/Minesweeper";
+import { IconContext } from "react-icons";
 
 function App() {
   const [hideLateralMenu, setHideLateralMenu] = useState<boolean>(false);
@@ -25,16 +26,18 @@ function App() {
 
   return (
     <>
-      <PageWidth.Provider value={providerPageWidth}>
-        <Navbar
-          hideLateralMenu={hideLateralMenu}
-          setHideLateralMenu={setHideLateralMenu}
-        />
-        <Content>
-          <LateralMenu hide={hideLateralMenu} />
-          <Minesweeper />
-        </Content>
-      </PageWidth.Provider>
+      <PageWidthContext.Provider value={providerPageWidth}>
+        <IconContext.Provider value={{ size: "2em" }}>
+          <Navbar
+            hideLateralMenu={hideLateralMenu}
+            setHideLateralMenu={setHideLateralMenu}
+          />
+          <Content>
+            <LateralMenu hide={hideLateralMenu} />
+            <Minesweeper />
+          </Content>
+        </IconContext.Provider>
+      </PageWidthContext.Provider>
     </>
   );
 }

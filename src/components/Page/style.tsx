@@ -3,7 +3,6 @@ import styled from "styled-components";
 export const OuterWrapperDiv = styled.div<{ width: string }>`
   width: ${(props) => props.width} !important;
   border-radius: 10px;
-  box-shadow: 0 0 7px 1px #ececec;
   margin: ${(props) => (props.width === "100%" ? "7px 0 0 0" : "7px 0 0 7px")};
   background-color: #f0f0f0;
 `;

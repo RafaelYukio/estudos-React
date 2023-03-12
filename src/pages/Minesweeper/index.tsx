@@ -10,7 +10,7 @@ import MinesDivMatrix from "../../components/MinesDivMatrix";
 import MinesInputNumber from "../../components/MinesInputNumber";
 import Modal from "../../components/Modal";
 import Page from "../../components/Page";
-import { PageWidth } from "../../context/PageWidth";
+import { PageWidthContext } from "../../contexts/PageWidth";
 import * as S from "./styles";
 
 const Minesweeper = (): JSX.Element => {
@@ -34,7 +34,7 @@ const Minesweeper = (): JSX.Element => {
     cssOnMouseLeave: string;
   }
 
-  const { pageWidth } = useContext(PageWidth);
+  const { pageWidth } = useContext(PageWidthContext);
 
   const [zoomMatrix, setZoomMatrix] = useState<string>("1");
 

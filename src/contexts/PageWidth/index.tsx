@@ -5,4 +5,4 @@ interface ProviderPageSize {
   setPageWidth?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const PageWidth = createContext<ProviderPageSize>({ pageWidth: "85%" });
+export const PageWidthContext = createContext<ProviderPageSize>({ pageWidth: "85%" });
