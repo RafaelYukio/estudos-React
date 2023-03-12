@@ -76,7 +76,7 @@ const Minesweeper = (): JSX.Element => {
     cssOnMouseLeave: "none",
   };
 
-  const [modalNotOpened, setModalNotOpened] = useState<boolean>(true);
+  const [modalNotOpened, setModalNotOpened] = useState<boolean>(false);
 
   let modalMessage: string = "Você ganhou!";
 

@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "../Button";
 import * as S from "./style";
 
 interface Props {
@@ -6,7 +8,19 @@ interface Props {
 }
 
 const LateralMenu = ({ hide }: Props) => {
-  return !hide ? <S.WrapperDiv>Estudos React!</S.WrapperDiv> : null;
+  const navigate = useNavigate();
+
+  return !hide ? (
+    <S.WrapperDiv>
+      <S.WrapperButtonDiv>
+        <S.Button onClick={() => navigate("/")}>Home</S.Button>
+        Jogos
+        <S.Button onClick={() => navigate("/minesweeper")}>
+          Minesweeper
+        </S.Button>
+      </S.WrapperButtonDiv>
+    </S.WrapperDiv>
+  ) : null;
 };
 
 export default LateralMenu;

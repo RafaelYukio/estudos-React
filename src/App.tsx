@@ -7,6 +7,7 @@ import { PageWidthContext } from "./contexts/PageWidth";
 import Minesweeper from "./pages/Minesweeper";
 import { IconContext } from "react-icons";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
 
 function App() {
   const [hideLateralMenu, setHideLateralMenu] = useState<boolean>(false);
@@ -33,12 +34,15 @@ function App() {
             hideLateralMenu={hideLateralMenu}
             setHideLateralMenu={setHideLateralMenu}
           />
-
           <Content>
             <Router>
               <LateralMenu hide={hideLateralMenu} />
               <Routes>
-                <Route path="/" element={<Minesweeper />} />
+                <Route path="/" element={<Home></Home>} />
+                <Route
+                  path="/minesweeper"
+                  element={<Minesweeper></Minesweeper>}
+                />
               </Routes>
             </Router>
           </Content>

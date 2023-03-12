@@ -20,7 +20,7 @@ export const ButtonOuterWrapperDiv = styled.div`
 export const ButtonInnerWrapperDiv = styled.div`
   display: flex;
   height: 120px;
-  width: 120px;
+  width: 40%;
   padding: 20px 20px 0 20px;
   margin-top: 60px;
   justify-content: start;
