@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar";
 import { PageWidthContext } from "./contexts/PageWidth";
 import Minesweeper from "./pages/Minesweeper";
 import { IconContext } from "react-icons";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   const [hideLateralMenu, setHideLateralMenu] = useState<boolean>(false);
