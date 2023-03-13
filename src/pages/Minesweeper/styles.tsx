@@ -4,7 +4,7 @@ export const WrapperDiv = styled.div`
   flex-direction: row;
 `;
 
-export const MinesWrapper = styled.data<{ zoom: string }>`
+export const MinesWrapper = styled.div<{ zoom: string }>`
   transform-origin: top;
   transform: scale(${(props) => props.zoom});
 `;

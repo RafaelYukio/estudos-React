@@ -11,27 +11,16 @@ export const WrapperDiv = styled.div`
   font-weight: bold;
 `;
 
-export const ButtonOuterWrapperDiv = styled.div`
+export const ButtonWrapperDiv = styled.div`
   justify-content: start;
   align-items: start;
-  width: 15%;
-`;
-
-export const ButtonInnerWrapperDiv = styled.div`
-  display: flex;
-  height: 120px;
-  width: 40%;
-  padding: 20px 20px 0 20px;
-  margin-top: 60px;
-  justify-content: start;
-  border: none;
-  border-radius: 10px;
-  background-color: #6c6c6c;
+  width: 20%;
 `;
 
 export const Button = styled.button`
   padding: 15px;
   display: flex;
+  margin-left: 20px;
   align-items: center;
   justify-content: center;
   border: none;
@@ -44,11 +33,12 @@ export const Button = styled.button`
 `;
 
 export const InformationDiv = styled.div`
+  padding-right: 20px;
   flex-direction: row;
   font-size: 18px;
-  justify-content: start;
+  justify-content: end;
   color: white;
-  width: 15%;
+  width: 20%;
 `;
 
 export const InformationSpan = styled.span`
@@ -56,7 +46,7 @@ export const InformationSpan = styled.span`
 `;
 
 export const TitleDiv = styled.div`
-  width: 70%;
+  width: 60%;
   flex-direction: row;
 `;
 

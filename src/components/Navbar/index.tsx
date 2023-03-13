@@ -14,13 +14,11 @@ const Navbar = ({ setHideLateralMenu, hideLateralMenu }: Props) => {
     hideLateralMenu ? setPageWidth("100%") : setPageWidth("85%");
   return (
     <S.WrapperDiv>
-      <S.ButtonOuterWrapperDiv>
-        <S.ButtonInnerWrapperDiv>
-          <S.Button onClick={() => setHideLateralMenu(!hideLateralMenu)}>
-            {hideLateralMenu ? "Show Menu" : "Hide Menu"}
-          </S.Button>
-        </S.ButtonInnerWrapperDiv>
-      </S.ButtonOuterWrapperDiv>
+      <S.ButtonWrapperDiv>
+        <S.Button onClick={() => setHideLateralMenu(!hideLateralMenu)}>
+          {hideLateralMenu ? "Show Menu" : "Hide Menu"}
+        </S.Button>
+      </S.ButtonWrapperDiv>
 
       <S.TitleDiv>
         <FaReact size={"3em"} color={"#61DAFB"} />

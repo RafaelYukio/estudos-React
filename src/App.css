@@ -4,6 +4,9 @@ div {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 button,
