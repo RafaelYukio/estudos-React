@@ -1,5 +1,4 @@
 import React from "react";
-import Divider from "../Divider";
 import * as S from "./style";
 
 interface Props {

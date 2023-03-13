@@ -4,7 +4,6 @@ import Page from "../../components/Page";
 import ReactMarkdown from "react-markdown";
 import * as S from "./style";
 import { PageWidthContext } from "../../contexts/PageWidth";
-import Divider from "../../components/Divider";
 
 const Home = (): JSX.Element => {
   const { pageWidth } = useContext(PageWidthContext);
@@ -32,7 +31,7 @@ const Home = (): JSX.Element => {
       </S.DescriptionWrapperDiv>
       <S.ReadmeWrapperDiv>
         README.md
-        <Divider />
+        <hr />
         <ReactMarkdown>{readme}</ReactMarkdown>
       </S.ReadmeWrapperDiv>
     </Page>

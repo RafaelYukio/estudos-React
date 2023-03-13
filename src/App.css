@@ -14,3 +14,8 @@ input {
   font-family: inherit;
   font-weight: bolder;
 }
+
+hr {
+  width: 100%;
+  border: solid #f0f0f0 1px;
+}
