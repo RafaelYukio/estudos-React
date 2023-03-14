@@ -1,4 +1,6 @@
 import React, {
+  MutableRefObject,
+  RefObject,
   useCallback,
   useContext,
   useEffect,
@@ -42,12 +44,18 @@ const Minesweeper = (): JSX.Element => {
   const matrixRefs: FieldRefs = useRef<FieldRefs>({});
   const logicMatrixRefs: FieldRefs = useRef<FieldRefs>({});
 
-  const inputRefRow: React.RefObject<HTMLInputElement> =
+  const inputRefRow: RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
-  const inputRefColumn: React.RefObject<HTMLInputElement> =
+  const inputRefColumn: RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
-  const inputRefQuantity: React.RefObject<HTMLInputElement> =
+  const inputRefQuantity: RefObject<HTMLInputElement> =
     useRef<HTMLInputElement>(null);
+
+  const accumulatorMatrix: MutableRefObject<number[][][]> = useRef(
+    new Array<Array<Array<number>>>()
+  );
+  const [accumulatorMatrixTrigger, setAccumulatorMatrixTrigger] =
+    useState<boolean>(false);
 
   const [onlyMinesMatrix, setOnlyMinesMatrix] = useState<Array<Array<number>>>(
     Array.from({ length: 6 }, (x) => new Array(6).fill(0))
@@ -62,11 +70,11 @@ const Minesweeper = (): JSX.Element => {
     Array.from({ length: 6 }, (x) => new Array(6).fill(null))
   );
 
-  const mineIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
+  const mineIndexes: MutableRefObject<Array<Array<number>>> = useRef(
     new Array<Array<number>>()
   );
 
-  const flagIndexes: React.MutableRefObject<Array<Array<number>>> = useRef(
+  const flagIndexes: MutableRefObject<Array<Array<number>>> = useRef(
     new Array<Array<number>>()
   );
 
@@ -79,6 +87,15 @@ const Minesweeper = (): JSX.Element => {
   const [modalNotOpened, setModalNotOpened] = useState<boolean>(false);
 
   let modalMessage: string = "Você ganhou!";
+
+  const changeZoomMatrix = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event?.target.value) {
+        setZoomMatrix((parseInt(event?.target.value) / 100).toString());
+      }
+    },
+    []
+  );
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
 
@@ -113,6 +130,70 @@ const Minesweeper = (): JSX.Element => {
     return indexes;
   };
 
+  function setLogicMatrixToMaskingMatrix(matrix: Array<Array<number>>) {
+    let logicToMaskingMatrix = matrix.map((column) =>
+      column.map((field) => {
+        if (field === 10) return "";
+        else if (field === 9) return "M";
+        else if (field === null) {
+          return " ";
+        } else {
+          return field.toString();
+        }
+      })
+    );
+
+    flagIndexes.current.forEach((currentArrayColumn, columnIndex) => {
+      currentArrayColumn.forEach((flagIndex) => {
+        logicToMaskingMatrix[columnIndex][flagIndex] = "F";
+      });
+    });
+
+    setMaskingMatrix(logicToMaskingMatrix);
+  }
+
+  const cloneMatrix = (matrix: Array<Array<number>>): Array<Array<number>> =>
+    matrix.map((array) => array.map((value) => value));
+
+  const cloneArrayOfMatrix = (
+    matrix: Array<Array<Array<number>>>
+  ): Array<Array<Array<number>>> =>
+    matrix.map((arrayOfMatrix) =>
+      arrayOfMatrix.map((matrix) => matrix.map((value) => value))
+    );
+
+  function startReplay(): void {
+    setMaskingMatrix(
+      Array.from(
+        { length: parseInt(inputRefColumn.current?.value || "0") },
+        (x) => new Array(parseInt(inputRefRow.current?.value || "0")).fill(" ")
+      )
+    );
+    setAccumulatorMatrixTrigger(true);
+  }
+
+  useEffect(() => {
+    if (accumulatorMatrixTrigger === true) {
+      const timerId = setInterval(() => {
+        if (accumulatorMatrix.current[counter.current] !== undefined) {
+          setLogicMatrix(
+            cloneMatrix(accumulatorMatrix.current[counter.current])
+          );
+          setLogicMatrixToMaskingMatrix(
+            accumulatorMatrix.current[counter.current]
+          );
+          counter.current++;
+        } else {
+          counter.current = 0;
+          setAccumulatorMatrixTrigger(false);
+        }
+      }, 100);
+      return function cleanup() {
+        clearInterval(timerId);
+      };
+    }
+  }, [accumulatorMatrixTrigger]);
+
   const generateMinesweeper = useCallback(() => {
     const inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
     const inputRow: number = parseInt(inputRefRow.current?.value || "0");
@@ -126,6 +207,8 @@ const Minesweeper = (): JSX.Element => {
     );
 
     setModalNotOpened(true);
+    accumulatorMatrix.current = new Array<Array<Array<number>>>();
+    counter.current = 0;
     setLogicMatrix(
       Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
     );
@@ -181,30 +264,46 @@ const Minesweeper = (): JSX.Element => {
     setMatrix(tempMatrix);
   }, []);
 
+  const counter: MutableRefObject<number> = useRef(0);
+
+  function findNearEmptyFields(coordinates: Array<number>): void {
+    logicMatrix[coordinates[0]][coordinates[1]] =
+      matrix[coordinates[0]][coordinates[1]];
+
+    if (matrix[coordinates[0]][coordinates[1]] === 0) {
+      for (let x = -1; x < 2; x++) {
+        for (let y = -1; y < 2; y++) {
+          if (x === 0 && y === 0) {
+            logicMatrix[coordinates[0] + x][coordinates[1] + y] = 10;
+          } else {
+            if (
+              matrix[coordinates[0] + x] !== undefined &&
+              matrix[coordinates[0] + x][coordinates[1] + y] !== undefined &&
+              logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 10
+            ) {
+              logicMatrix[coordinates[0] + x][coordinates[1] + y] =
+                matrix[coordinates[0] + x][coordinates[1] + y];
+
+              accumulatorMatrix.current.push(cloneMatrix(logicMatrix));
+
+              if (matrix[coordinates[0] + x][coordinates[1] + y] === 0) {
+                findNearEmptyFields([coordinates[0] + x, coordinates[1] + y]);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      accumulatorMatrix.current.push(cloneMatrix(logicMatrix));
+    }
+  }
+
   function fieldLeftClick(button: React.MouseEvent<HTMLButtonElement>): void {
     findNearEmptyFields(getCoordinatesById(button, "mm "));
 
     setLogicMatrix([...logicMatrix]);
 
-    let logicToMaskingMatrix = logicMatrix.map((column) =>
-      column.map((field) => {
-        if (field === 10) return "";
-        else if (field === 9) return "M";
-        else if (field === null) {
-          return " ";
-        } else {
-          return field.toString();
-        }
-      })
-    );
-
-    flagIndexes.current.forEach((currentArrayColumn, columnIndex) => {
-      currentArrayColumn.forEach((flagIndex) => {
-        logicToMaskingMatrix[columnIndex][flagIndex] = "F";
-      });
-    });
-
-    setMaskingMatrix(logicToMaskingMatrix);
+    setLogicMatrixToMaskingMatrix(logicMatrix);
   }
 
   function fieldRightClick(
@@ -261,34 +360,6 @@ const Minesweeper = (): JSX.Element => {
     else return false;
   };
 
-  function findNearEmptyFields(coordinates: Array<number>): void {
-    logicMatrix[coordinates[0]][coordinates[1]] =
-      matrix[coordinates[0]][coordinates[1]];
-
-    if (matrix[coordinates[0]][coordinates[1]] === 0) {
-      for (let x = -1; x < 2; x++) {
-        for (let y = -1; y < 2; y++) {
-          if (x === 0 && y === 0) {
-            logicMatrix[coordinates[0] + x][coordinates[1] + y] = 10;
-          } else {
-            if (
-              matrix[coordinates[0] + x] !== undefined &&
-              matrix[coordinates[0] + x][coordinates[1] + y] !== undefined &&
-              logicMatrix[coordinates[0] + x][coordinates[1] + y] !== 10
-            ) {
-              logicMatrix[coordinates[0] + x][coordinates[1] + y] =
-                matrix[coordinates[0] + x][coordinates[1] + y];
-
-              if (matrix[coordinates[0] + x][coordinates[1] + y] === 0) {
-                findNearEmptyFields([coordinates[0] + x, coordinates[1] + y]);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
   function fieldHighlight(
     button: React.MouseEvent<HTMLButtonElement>,
     brightness: string
@@ -320,26 +391,45 @@ const Minesweeper = (): JSX.Element => {
         width={pageWidth}
       >
         <S.WrapperDiv>
-          <MinesInputNumber inputRef={inputRefRow} defaultValue={6}>
+          <MinesInputNumber
+            inputRef={inputRefRow}
+            defaultValue={6}
+            min={1}
+            max={50}
+          >
             Linhas
           </MinesInputNumber>
-          <MinesInputNumber inputRef={inputRefColumn} defaultValue={6}>
+          <MinesInputNumber
+            inputRef={inputRefColumn}
+            defaultValue={6}
+            min={1}
+            max={50}
+          >
             Colunas
           </MinesInputNumber>
-          <MinesInputNumber inputRef={inputRefQuantity} defaultValue={15}>
+          <MinesInputNumber
+            inputRef={inputRefQuantity}
+            defaultValue={15}
+            min={0}
+            max={100}
+          >
             Quantidade (%)
           </MinesInputNumber>
           <MinesInputNumber
-            onChange={(event) => {
-              if (event?.target.value)
-                setZoomMatrix((parseInt(event?.target.value) / 100).toString());
-            }}
+            onChange={changeZoomMatrix}
             defaultValue={100}
+            min={1}
+            max={100}
           >
             Zoom (%)
           </MinesInputNumber>
         </S.WrapperDiv>
-        <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
+        <S.ButtonWrapperDiv>
+          <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
+          <Button
+            onClick={startReplay}
+          >Replay snapshots:<S.ReplaySpan>{`${counter.current} / ${accumulatorMatrix.current.length}`}</S.ReplaySpan></Button>
+        </S.ButtonWrapperDiv>
         <S.MinesWrapper zoom={zoomMatrix}>
           <MinesDivMatrix
             matrix={maskingMatrix}

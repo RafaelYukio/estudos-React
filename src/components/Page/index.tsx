@@ -9,7 +9,6 @@ interface Props {
 }
 
 const Page = ({ title, description, width, children }: Props) => {
-  console.log("passei na page");
   return (
     <S.OuterWrapperDiv width={width}>
       <S.InnerWrapperDiv>
