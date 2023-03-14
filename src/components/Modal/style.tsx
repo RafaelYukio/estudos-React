@@ -20,9 +20,9 @@ export const ModalDiv = styled.div`
   width: 700px;
   height: 400px;
   background-color: white;
-  border-radius: 50px;
+  border-radius: 30px;
   border: solid #c2c2c2 1px;
-  box-shadow: 0 0 20px 3px #c2c2c2;
+  box-shadow: 0 0 10px 3px #c2c2c2;
   background-color: #f5f5f5;
 `;
 
