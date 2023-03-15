@@ -8,6 +8,8 @@ import Minesweeper from "./pages/Minesweeper";
 import { IconContext } from "react-icons";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Repository from "./pages/Repository";
+import Sudoku from "./pages/Sudoku";
 
 function App() {
   const [hideLateralMenu, setHideLateralMenu] = useState<boolean>(false);
@@ -27,28 +29,25 @@ function App() {
   );
 
   return (
-    <>
-      <PageWidthContext.Provider value={providerPageWidth}>
-        <IconContext.Provider value={{ size: "2em" }}>
-          <Navbar
-            hideLateralMenu={hideLateralMenu}
-            setHideLateralMenu={setHideLateralMenu}
-          />
-          <Content>
-            <Router>
-              <LateralMenu hide={hideLateralMenu} />
-              <Routes>
-                <Route path="/" element={<Home></Home>} />
-                <Route
-                  path="/minesweeper"
-                  element={<Minesweeper></Minesweeper>}
-                />
-              </Routes>
-            </Router>
-          </Content>
-        </IconContext.Provider>
-      </PageWidthContext.Provider>
-    </>
+    <PageWidthContext.Provider value={providerPageWidth}>
+      <IconContext.Provider value={{ size: "2em" }}>
+        <Navbar
+          hideLateralMenu={hideLateralMenu}
+          setHideLateralMenu={setHideLateralMenu}
+        />
+        <Content>
+          <Router>
+            <LateralMenu hide={hideLateralMenu} />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/repository" element={<Repository />} />
+              <Route path="/minesweeper" element={<Minesweeper />} />
+              <Route path="/sudoku" element={<Sudoku />} />
+            </Routes>
+          </Router>
+        </Content>
+      </IconContext.Provider>
+    </PageWidthContext.Provider>
   );
 }
 

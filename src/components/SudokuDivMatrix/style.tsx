@@ -1,0 +1,17 @@
+import styled from "styled-components";
+
+export const MatrixRowWrapperDiv = styled.div`
+  width: auto;
+  flex-direction: Row;
+`;
+
+export const MatrixColumnWrapperDiv = styled.div`
+  width: auto;
+  flex-direction: column;
+`;
+
+export const MatrixInput = styled.input`
+  width: 40px;
+  height: 40px;
+  border: solid #f2f2f2 1px;
+`;

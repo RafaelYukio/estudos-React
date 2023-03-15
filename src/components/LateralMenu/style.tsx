@@ -6,13 +6,21 @@ export const WrapperDiv = styled.div`
   margin-top: -20px;
   border: none;
   border-radius: 10px;
-  background-color: #6c6c6c;
+  background-color: #3A4C4F;
   font-weight: bold;
 `;
 
+export const TitleDiv = styled.div`
+  margin-top: 15px;
+`;
+
+export const Divider = styled.hr`
+  width: 90%;
+  border: solid #6c6c6c 1px;
+`;
+
 export const Button = styled.button`
-  padding: 20px 0 20px 30px;
-  margin: 2px;
+  padding: 15px 0 15px 30px;
   width: 100%;
   display: flex;
   align-items: center;

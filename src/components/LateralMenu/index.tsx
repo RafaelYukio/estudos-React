@@ -1,6 +1,4 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../Button";
 import * as S from "./style";
 
 interface Props {
@@ -14,10 +12,15 @@ const LateralMenu = ({ hide }: Props) => {
     <S.WrapperDiv>
       <S.WrapperButtonDiv>
         <S.Button onClick={() => navigate("/")}>Home</S.Button>
-        Jogos
+        <S.Button onClick={() => navigate("/repository")}>Repository</S.Button>
+        <S.TitleDiv>
+          Jogos
+          <S.Divider />
+        </S.TitleDiv>
         <S.Button onClick={() => navigate("/minesweeper")}>
           Minesweeper
         </S.Button>
+        <S.Button onClick={() => navigate("/sudoku")}>Sudoku</S.Button>
       </S.WrapperButtonDiv>
     </S.WrapperDiv>
   ) : null;
