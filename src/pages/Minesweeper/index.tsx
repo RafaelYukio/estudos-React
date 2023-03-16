@@ -12,6 +12,7 @@ import MinesDivMatrix from "../../components/MinesDivMatrix";
 import MinesInputNumber from "../../components/MinesInputNumber";
 import Modal from "../../components/Modal";
 import Page from "../../components/Page";
+import Toggle from "../../components/Toggle";
 import { PageWidthContext } from "../../contexts/PageWidth";
 import * as S from "./styles";
 
@@ -39,6 +40,7 @@ const Minesweeper = (): JSX.Element => {
   const { pageWidth } = useContext(PageWidthContext);
 
   const [zoomMatrix, setZoomMatrix] = useState<string>("1");
+  const [showOtherMatrixes, setShowOtherMatrixes] = useState<boolean>(true);
 
   const onlyMinesMatrixRefs: FieldRefs = useRef<FieldRefs>({});
   const matrixRefs: FieldRefs = useRef<FieldRefs>({});
@@ -69,6 +71,9 @@ const Minesweeper = (): JSX.Element => {
   const [maskingMatrix, setMaskingMatrix] = useState<Array<Array<string>>>(
     Array.from({ length: 6 }, (x) => new Array(6).fill(null))
   );
+  const [helpMatrix, setHelpMatrix] = useState<Array<Array<string>>>(
+    Array.from({ length: 3 }, (x) => new Array(3).fill(null))
+  );
 
   const mineIndexes: MutableRefObject<Array<Array<number>>> = useRef(
     new Array<Array<number>>()
@@ -86,12 +91,12 @@ const Minesweeper = (): JSX.Element => {
 
   const [modalNotOpened, setModalNotOpened] = useState<boolean>(false);
 
-  let modalMessage: string = "Você ganhou!";
+  let modalMessage: string = "You won!";
 
   const changeZoomMatrix = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event?.target.value) {
-        setZoomMatrix((parseInt(event?.target.value) / 100).toString());
+        setZoomMatrix((event?.target.valueAsNumber / 100).toString());
       }
     },
     []
@@ -130,7 +135,9 @@ const Minesweeper = (): JSX.Element => {
     return indexes;
   };
 
-  function setLogicMatrixToMaskingMatrix(matrix: Array<Array<number>>) {
+  function setLogicMatrixToMaskingMatrix(
+    matrix: Array<Array<number>>
+  ): Array<Array<string>> {
     let logicToMaskingMatrix = matrix.map((column) =>
       column.map((field) => {
         if (field === 10) return "";
@@ -150,6 +157,8 @@ const Minesweeper = (): JSX.Element => {
     });
 
     setMaskingMatrix(logicToMaskingMatrix);
+
+    return logicToMaskingMatrix;
   }
 
   const cloneMatrix = (matrix: Array<Array<number>>): Array<Array<number>> =>
@@ -164,9 +173,8 @@ const Minesweeper = (): JSX.Element => {
 
   function startReplay(): void {
     setMaskingMatrix(
-      Array.from(
-        { length: parseInt(inputRefColumn.current?.value || "0") },
-        (x) => new Array(parseInt(inputRefRow.current?.value || "0")).fill(" ")
+      Array.from({ length: inputRefColumn.current?.valueAsNumber || 0 }, (x) =>
+        new Array(inputRefRow.current?.valueAsNumber || 0).fill(" ")
       )
     );
     setAccumulatorMatrixTrigger(true);
@@ -195,11 +203,10 @@ const Minesweeper = (): JSX.Element => {
   }, [accumulatorMatrixTrigger]);
 
   const generateMinesweeper = useCallback(() => {
-    const inputColumn: number = parseInt(inputRefColumn.current?.value || "0");
-    const inputRow: number = parseInt(inputRefRow.current?.value || "0");
-    const inputQuantityPercentage: number = parseInt(
-      inputRefQuantity.current?.value || "0"
-    );
+    const inputColumn: number = inputRefColumn.current?.valueAsNumber || 0;
+    const inputRow: number = inputRefRow.current?.valueAsNumber || 0;
+    const inputQuantityPercentage: number =
+      inputRefQuantity.current?.valueAsNumber || 0;
 
     let tempMatrix: Array<Array<number>> = Array.from(
       { length: inputColumn },
@@ -210,11 +217,12 @@ const Minesweeper = (): JSX.Element => {
     accumulatorMatrix.current = new Array<Array<Array<number>>>();
     counter.current = 0;
     setLogicMatrix(
-      Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(null))
+      Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(" "))
     );
     setMaskingMatrix(
       Array.from({ length: inputColumn }, (x) => new Array(inputRow).fill(" "))
     );
+    setHelpMatrix(Array.from({ length: 3 }, (x) => new Array(3).fill(null)));
     mineIndexes.current = new Array<Array<number>>();
     flagIndexes.current = new Array<Array<number>>();
 
@@ -298,27 +306,31 @@ const Minesweeper = (): JSX.Element => {
     }
   }
 
-  function fieldLeftClick(button: React.MouseEvent<HTMLButtonElement>): void {
-    findNearEmptyFields(getCoordinatesById(button, "mm "));
+  function fieldLeftClick(event: React.MouseEvent<HTMLButtonElement>): void {
+    let coordinates: Array<number> = getCoordinatesById(event, "mm ");
+
+    findNearEmptyFields(coordinates);
 
     setLogicMatrix([...logicMatrix]);
+    let currentMaskingMatrix = setLogicMatrixToMaskingMatrix(logicMatrix);
 
-    setLogicMatrixToMaskingMatrix(logicMatrix);
+    setHelpMatrixView(coordinates, currentMaskingMatrix);
   }
 
   function fieldRightClick(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void {
     event.preventDefault();
-    let coordinate = getCoordinatesById(event, "mm ");
-    if (maskingMatrix[coordinate[0]][coordinate[1]] === "F")
-      maskingMatrix[coordinate[0]][coordinate[1]] = " ";
-    else if (maskingMatrix[coordinate[0]][coordinate[1]] === " ")
-      maskingMatrix[coordinate[0]][coordinate[1]] = "F";
+    let coordinates = getCoordinatesById(event, "mm ");
+    if (maskingMatrix[coordinates[0]][coordinates[1]] === "F")
+      maskingMatrix[coordinates[0]][coordinates[1]] = " ";
+    else if (maskingMatrix[coordinates[0]][coordinates[1]] === " ")
+      maskingMatrix[coordinates[0]][coordinates[1]] = "F";
 
     setMaskingMatrix([...maskingMatrix]);
 
     flagIndexes.current = findIndexes(maskingMatrix, "F");
+    setHelpMatrixView(coordinates, maskingMatrix);
   }
 
   let checkEnd = (maskingMatrix: Array<Array<string>>): boolean => {
@@ -336,7 +348,7 @@ const Minesweeper = (): JSX.Element => {
         })
       )
     ) {
-      modalMessage = "Você perdeu!";
+      modalMessage = "Booom!";
       return true;
     }
 
@@ -364,15 +376,113 @@ const Minesweeper = (): JSX.Element => {
     button: React.MouseEvent<HTMLButtonElement>,
     brightness: string
   ): void {
-    let coordinates: Array<number> = getCoordinatesById(button, "mm ");
+    if (showOtherMatrixes) {
+      let coordinates: Array<number> = getCoordinatesById(button, "mm ");
 
-    onlyMinesMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
-      brightness;
-    matrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
-      brightness;
-    logicMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
-      brightness;
+      onlyMinesMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
+        brightness;
+      matrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
+        brightness;
+      logicMatrixRefs[`c${coordinates[0]}r${coordinates[1]}`].style.filter =
+        brightness;
+
+      setHelpMatrixView(coordinates, maskingMatrix);
+    }
   }
+
+  const binaryPossibilitiesValue: MutableRefObject<number[][]> = useRef(
+    new Array<Array<number>>()
+  );
+
+  function setHelpMatrixView(
+    coordinates: Array<number>,
+    currentMaskingMatrix: Array<Array<string>>
+  ) {
+    let tempMatrix: Array<Array<string>> = Array.from({ length: 3 }, (x) =>
+      new Array(3).fill(null)
+    );
+
+    for (let y = -1; y < 2; y++) {
+      for (let x = -1; x < 2; x++) {
+        if (
+          currentMaskingMatrix[coordinates[0] + y] !== undefined &&
+          currentMaskingMatrix[coordinates[0] + y][coordinates[1] + x] !==
+            undefined
+        ) {
+          tempMatrix[y + 1][x + 1] =
+            currentMaskingMatrix[coordinates[0] + y][coordinates[1] + x];
+        }
+      }
+    }
+
+    let notDiscoveredFields: number = 0;
+    let flagFields: number = 0;
+    let minesQuantity: number = parseInt(tempMatrix[1][1]);
+
+    tempMatrix.forEach((array) => {
+      notDiscoveredFields += array.reduce((accumulator, currentValue) => {
+        if (currentValue === " ") return (accumulator += 1);
+        else return accumulator;
+      }, 0);
+      flagFields += array.reduce((accumulator, currentValue) => {
+        if (currentValue === "F") return (accumulator += 1);
+        else return accumulator;
+      }, 0);
+    });
+
+    binaryPossibilitiesValue.current = binaryPossibilities(
+      minesQuantity - flagFields,
+      notDiscoveredFields
+    );
+
+    tempMatrix = tempMatrix.map((array) =>
+      array.map((value) => {
+        if (value === " " && binaryPossibilitiesValue.current.length !== 0) {
+          return binaryPossibilitiesValue.current.length === 1 ? "X" : "?";
+        } else return value;
+      })
+    );
+
+    setHelpMatrix(tempMatrix);
+  }
+
+  const binaryPossibilities = (
+    numberOfOnes: number,
+    arrayLength: number
+  ): Array<Array<number>> => {
+    if (numberOfOnes === 0) return [];
+    let array = new Array(arrayLength).fill(0);
+    let maxValue = 2 ** arrayLength - 1;
+    let zeroToMaxValueBinary: Array<Array<number>> = new Array<Array<number>>();
+    let binaryPossibilities: Array<Array<number>> = new Array<Array<number>>();
+
+    for (let i = 0; i <= maxValue; i++) {
+      let valueToBinary = i;
+      let result = array.map((binary, index) => {
+        let binaryToValue = 2 ** (array.length - index - 1);
+        if (binaryToValue > valueToBinary) return 0;
+        else {
+          valueToBinary = valueToBinary - binaryToValue;
+          return 1;
+        }
+      });
+      zeroToMaxValueBinary.push(result.reverse());
+    }
+
+    binaryPossibilities = zeroToMaxValueBinary.reduce(
+      (accumulator, currentArray) => {
+        let oneCounter: number = 0;
+        currentArray.forEach((value) => {
+          if (value === 1) oneCounter++;
+        });
+        if (oneCounter === numberOfOnes) accumulator.push(currentArray);
+        return accumulator;
+      },
+      new Array<Array<number>>()
+    );
+
+    return binaryPossibilities;
+  };
 
   return (
     <>
@@ -381,15 +491,20 @@ const Minesweeper = (): JSX.Element => {
           PrimaryButtonOnClick={() => {
             setModalNotOpened(false);
           }}
-          Header="Campo Minado"
+          Header="Minesweeper"
           Content={modalMessage}
         />
       )}
       <Page
-        title={"Campo Minado"}
+        title={"Minesweeper"}
         description={"100% handmade XD"}
         width={pageWidth}
       >
+        <S.WrapperDiv>
+          <Toggle onClick={() => setShowOtherMatrixes(!showOtherMatrixes)}>
+            Only game
+          </Toggle>
+        </S.WrapperDiv>
         <S.WrapperDiv>
           <MinesInputNumber
             inputRef={inputRefRow}
@@ -397,7 +512,7 @@ const Minesweeper = (): JSX.Element => {
             min={1}
             max={50}
           >
-            Linhas
+            Rows
           </MinesInputNumber>
           <MinesInputNumber
             inputRef={inputRefColumn}
@@ -405,7 +520,7 @@ const Minesweeper = (): JSX.Element => {
             min={1}
             max={50}
           >
-            Colunas
+            Columns
           </MinesInputNumber>
           <MinesInputNumber
             inputRef={inputRefQuantity}
@@ -413,7 +528,7 @@ const Minesweeper = (): JSX.Element => {
             min={0}
             max={100}
           >
-            Quantidade (%)
+            Quantity (%)
           </MinesInputNumber>
           <MinesInputNumber
             onChange={changeZoomMatrix}
@@ -425,34 +540,57 @@ const Minesweeper = (): JSX.Element => {
           </MinesInputNumber>
         </S.WrapperDiv>
         <S.ButtonWrapperDiv>
-          <Button onClick={generateMinesweeper}>Gerar Campo Minado</Button>
-          <Button
-            onClick={startReplay}
-          >Replay snapshots:<S.ReplaySpan>{`${counter.current} / ${accumulatorMatrix.current.length}`}</S.ReplaySpan></Button>
+          <Button onClick={generateMinesweeper}>New Game</Button>
+          <Button onClick={startReplay}>
+            Replay calculations:
+            <S.ReplaySpan>{`${counter.current} / ${accumulatorMatrix.current.length}`}</S.ReplaySpan>
+          </Button>
         </S.ButtonWrapperDiv>
         <S.MinesWrapper zoom={zoomMatrix}>
-          <MinesDivMatrix
-            matrix={maskingMatrix}
-            fieldLeftClick={fieldLeftClick}
-            fieldRightClick={fieldRightClick}
-            fieldHighligh={fieldHighlightProps}
-          >
-            Jogo
-          </MinesDivMatrix>
           <S.WrapperDiv>
             <MinesDivMatrix
-              matrix={onlyMinesMatrix}
-              matrixRefs={onlyMinesMatrixRefs}
+              matrix={maskingMatrix}
+              fieldLeftClick={fieldLeftClick}
+              fieldRightClick={fieldRightClick}
+              fieldHighligh={fieldHighlightProps}
             >
-              Matriz com minas (9):
+              Game
             </MinesDivMatrix>
-            <MinesDivMatrix matrix={matrix} matrixRefs={matrixRefs}>
-              Matriz com dicas (1~8):
-            </MinesDivMatrix>
-            <MinesDivMatrix matrix={logicMatrix} matrixRefs={logicMatrixRefs}>
-              Matriz Lógica (10 = entorno verificado)
-            </MinesDivMatrix>
+            {showOtherMatrixes && (
+              <S.HelpMatrixWrapperDiv>
+                <MinesDivMatrix matrix={helpMatrix}>
+                  Help matrix:
+                </MinesDivMatrix>
+                <S.HelpPossibilitiesDiv>
+                  <S.HelpPossibilitiesSpan>
+                    {`Possibilities: ${binaryPossibilitiesValue.current.length}`}
+                  </S.HelpPossibilitiesSpan>
+                  <br />
+                  <div>
+                    {binaryPossibilitiesValue.current.map((array) => (
+                      <span>{array}</span>
+                    ))}
+                  </div>
+                </S.HelpPossibilitiesDiv>
+              </S.HelpMatrixWrapperDiv>
+            )}
           </S.WrapperDiv>
+          {showOtherMatrixes && (
+            <S.WrapperDiv>
+              <MinesDivMatrix
+                matrix={onlyMinesMatrix}
+                fieldRefs={onlyMinesMatrixRefs}
+              >
+                Matrix with mines (9):
+              </MinesDivMatrix>
+              <MinesDivMatrix matrix={matrix} fieldRefs={matrixRefs}>
+                Matrix with clues (1~8):
+              </MinesDivMatrix>
+              <MinesDivMatrix matrix={logicMatrix} fieldRefs={logicMatrixRefs}>
+                Logic matrix (10 = surroundings checked)
+              </MinesDivMatrix>
+            </S.WrapperDiv>
+          )}
         </S.MinesWrapper>
       </Page>
     </>

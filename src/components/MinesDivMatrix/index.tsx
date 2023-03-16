@@ -23,7 +23,7 @@ interface DivMatrixMinesProps<T> {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
   fieldHighligh?: FieldHighlighProp;
-  matrixRefs?: FieldRefs;
+  fieldRefs?: FieldRefs;
   children: React.ReactNode;
 }
 
@@ -34,16 +34,16 @@ const MinesDivMatrix = <T,>({
   fieldLeftClick,
   fieldRightClick,
   fieldHighligh,
-  matrixRefs,
+  fieldRefs,
   children,
 }: DivMatrixMinesProps<T>): JSX.Element => {
   return (
     <S.MatrixWrapperDiv>
       {children}
       <S.WrapperDiv>
-        {matrix.map((content, indexColumn) => (
-          <S.ColumnDiv key={indexColumn}>
-            {content.map((content, indexRow) => (
+        {matrix.map((content, columnIndex) => (
+          <S.ColumnDiv key={columnIndex}>
+            {content.map((content, rowIndex) => (
               <S.MineButton
                 onMouseEnter={(button) => {
                   if (fieldHighligh !== undefined)
@@ -62,11 +62,11 @@ const MinesDivMatrix = <T,>({
                 onContextMenu={(event) => {
                   if (fieldRightClick !== undefined) fieldRightClick(event);
                 }}
-                key={`mm ${indexColumn} ${indexRow}`}
-                id={`mm ${indexColumn} ${indexRow}`}
+                key={`mm ${columnIndex} ${rowIndex}`}
+                id={`mm ${columnIndex} ${rowIndex}`}
                 ref={(ref) => {
-                  if (matrixRefs !== undefined)
-                    matrixRefs[`c${indexColumn}r${indexRow}`] = ref;
+                  if (fieldRefs !== undefined)
+                    fieldRefs[`c${columnIndex}r${rowIndex}`] = ref;
                 }}
                 content={content as string}
                 onClick={(button) => {
@@ -83,4 +83,5 @@ const MinesDivMatrix = <T,>({
   );
 };
 
+// Como os sets estão no componente pai, usando o React.memo, este componente sabe que não precisa se rerenderizar lá
 export default React.memo(MinesDivMatrix);

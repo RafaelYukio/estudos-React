@@ -23,18 +23,12 @@ export const ColumnDiv = styled.div`
 export const MineButton = styled.button<{ content: string }>`
   width: 50px;
   height: 50px;
-  border: solid #f2f2f2 1px;
+  color: ${(props) => (props.content === "X" ? "red" : "black")};
+  border: ${(props) => (props.content === null ? "none" : "solid #f2f2f2 1px")};
   border-radius: ${(props) =>
     props.content === " " || typeof props.content !== "string" ? "2px" : "7px"};
-  background-color: ${(props) =>
-    changeBackgroundColor(
-      typeof props.content === "string" ? props.content : " "
-    )};
-  box-shadow: 0 0 7px 4px
-    ${(props) =>
-      changeShadowBoxColor(
-        typeof props.content === "string" ? props.content : " "
-      )}
+  background-color: ${(props) => changeBackgroundColor(props.content)};
+  box-shadow: 0 0 7px 4px ${(props) => changeShadowBoxColor(props.content)}
     inset;
   &:hover {
     filter: brightness(98%) !important;
@@ -42,8 +36,11 @@ export const MineButton = styled.button<{ content: string }>`
 `;
 
 const changeBackgroundColor = (content: string): string => {
+  if (typeof content === "number") return "#f0f0f0";
   switch (content) {
     case " ":
+    case "X":
+    case "?":
       return "#f0f0f0";
     case "1":
       return "#F1F7FF";
@@ -71,6 +68,8 @@ const changeBackgroundColor = (content: string): string => {
 };
 
 const changeShadowBoxColor = (content: string): string => {
+  if (typeof content === "number") return "#ECECEC";
+  else if (content === null) return "white";
   switch (content) {
     case " ":
       return "#ECECEC";
