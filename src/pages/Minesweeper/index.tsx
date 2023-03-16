@@ -568,7 +568,7 @@ const Minesweeper = (): JSX.Element => {
                   <br />
                   <div>
                     {binaryPossibilitiesValue.current.map((array) => (
-                      <span>{array}</span>
+                      <span key={array.toString()}>{array}</span>
                     ))}
                   </div>
                 </S.HelpPossibilitiesDiv>
