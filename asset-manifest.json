@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/estudos-React/static/css/main.1cc5750b.css",
-    "main.js": "/estudos-React/static/js/main.e7501d65.js",
+    "main.js": "/estudos-React/static/js/main.916c05be.js",
     "static/js/787.bccbddbe.chunk.js": "/estudos-React/static/js/787.bccbddbe.chunk.js",
     "index.html": "/estudos-React/index.html",
     "main.1cc5750b.css.map": "/estudos-React/static/css/main.1cc5750b.css.map",
-    "main.e7501d65.js.map": "/estudos-React/static/js/main.e7501d65.js.map",
+    "main.916c05be.js.map": "/estudos-React/static/js/main.916c05be.js.map",
     "787.bccbddbe.chunk.js.map": "/estudos-React/static/js/787.bccbddbe.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1cc5750b.css",
-    "static/js/main.e7501d65.js"
+    "static/js/main.916c05be.js"
   ]
 }
