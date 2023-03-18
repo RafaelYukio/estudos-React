@@ -12,7 +12,7 @@ const Home = (): JSX.Element => {
   async function getUsuarios(): Promise<void> {
     try {
       const response = await axios.get(
-        `https://raw.githubusercontent.com/RafaelYukio/estudos-react/main/README.md`
+        `https://raw.githubusercontent.com/RafaelYukio/estudos-React/main/README.md`
       );
       setReadme(response.data);
     } catch (error) {
@@ -27,7 +27,7 @@ const Home = (): JSX.Element => {
   return (
     <Page title="Homepage" description="Homepage" width={pageWidth}>
       <S.DescriptionWrapperDiv>
-        Olar! Repositório: https://github.com/RafaelYukio/estudos-react
+        Olar! Repositório: https://github.com/RafaelYukio/estudos-React
       </S.DescriptionWrapperDiv>
       <S.ReadmeWrapperDiv>
         README.md

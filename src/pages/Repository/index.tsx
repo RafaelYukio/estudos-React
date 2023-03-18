@@ -35,7 +35,7 @@ const Home = (): JSX.Element => {
     try {
       await axios
         .get(
-          `https://api.github.com/repos/RafaelYukio/estudos-react/contents${directoryPath.current.reduce(
+          `https://api.github.com/repos/RafaelYukio/estudos-React/contents${directoryPath.current.reduce(
             (accumulator, currentValue) =>
               accumulator.concat(`/${currentValue}`)
           )}`
@@ -108,7 +108,7 @@ const Home = (): JSX.Element => {
   return (
     <Page title="Repository" description="Repository" width={pageWidth}>
       <S.DescriptionWrapperDiv>
-        Repositório: https://github.com/RafaelYukio/estudos-react
+        Repositório: https://github.com/RafaelYukio/estudos-React
         <br /> <br />
         Aqui criado utilizando a API do GitHub:
         https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28
@@ -120,7 +120,7 @@ const Home = (): JSX.Element => {
           <span>
             Path: RafaelYukio/
             <S.FileDirButton dataType={"dir"} onClick={() => backDirOnClick()}>
-              estudos-react
+              estudos-React
             </S.FileDirButton>
             {[...directoryPath.current].slice(1).map((path) => (
               <span>

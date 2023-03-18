@@ -6,7 +6,7 @@ Código com vários comentários com informações que acho relevante.
 ---------------------------------------
 
 Link para página:
-https://rafaelyukio.github.io/estudos-react/
+https://rafaelyukio.github.io/estudos-React/
 
 ---------------------------------------
 

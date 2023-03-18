@@ -1,7 +1,7 @@
 {
-  "name": "estudos-react",
+  "name": "estudos-React",
   "version": "0.1.0",
-  "homepage": "https://RafaelYukio.github.io/estudos-react",
+  "homepage": "https://RafaelYukio.github.io/estudos-React",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
