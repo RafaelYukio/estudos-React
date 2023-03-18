@@ -27,7 +27,7 @@ const SudokuDivMatrix = () => {
     if (event.deltaY < 0) {
       if (target.value === "") target.valueAsNumber = 1;
       else if (target.valueAsNumber < 9) target.valueAsNumber++;
-    } else if (target.valueAsNumber != 0) target.valueAsNumber--;
+    } else if (target.valueAsNumber !== 0) target.valueAsNumber--;
 
     matrix[columnMatrixIndex][matrixIndex][columnIndex][rowIndex] =
       target.valueAsNumber;

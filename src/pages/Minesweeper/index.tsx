@@ -14,7 +14,16 @@ import Modal from "../../components/Modal";
 import Page from "../../components/Page";
 import Toggle from "../../components/Toggle";
 import { PageWidthContext } from "../../contexts/PageWidth";
+import {
+  TbMoodSmileBeam,
+  TbMoodSuprised,
+  TbMoodSadDizzy,
+  TbMoodTongueWink2,
+} from "react-icons/tb";
+
+import { FaFlag } from "react-icons/fa";
 import * as S from "./styles";
+import MinesTimer from "../../components/MinesTimer";
 
 const Minesweeper = (): JSX.Element => {
   // Use callback para que, ao componente pai renderizar, ele não passe de novo funções desnecessáriamente
@@ -41,6 +50,13 @@ const Minesweeper = (): JSX.Element => {
 
   const [zoomMatrix, setZoomMatrix] = useState<string>("1");
   const [showOtherMatrixes, setShowOtherMatrixes] = useState<boolean>(true);
+
+  const timerCentiseconds: React.MutableRefObject<number> = useRef<number>(0);
+  const startTimer: React.MutableRefObject<boolean> = useRef<boolean>(false);
+
+  const [emoji, setEmoji] = useState<number>(1);
+
+  const endValue: React.MutableRefObject<boolean> = useRef<boolean>(false);
 
   const onlyMinesMatrixRefs: FieldRefs = useRef<FieldRefs>({});
   const matrixRefs: FieldRefs = useRef<FieldRefs>({});
@@ -90,17 +106,7 @@ const Minesweeper = (): JSX.Element => {
   };
 
   const [modalNotOpened, setModalNotOpened] = useState<boolean>(false);
-
-  let modalMessage: string = "You won!";
-
-  const changeZoomMatrix = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event?.target.value) {
-        setZoomMatrix((event?.target.valueAsNumber / 100).toString());
-      }
-    },
-    []
-  );
+  const modalMessage: React.MutableRefObject<string> = useRef("You win!");
 
   const getRandomInt = (max: number): number => Math.floor(Math.random() * max);
 
@@ -116,19 +122,20 @@ const Minesweeper = (): JSX.Element => {
 
   const findIndexes = (
     matrix: Array<Array<string>>,
-    toFind: string
+    toFind: Array<string>
   ): Array<Array<number>> => {
     let indexes: Array<Array<number>> = new Array<Array<number>>();
 
     matrix.forEach((currentArrayColumn) => {
       let columnIndexes = currentArrayColumn.reduce(
         (accumulator, currentValue, currentIndex) => {
-          if (currentValue === toFind) accumulator.push(currentIndex);
+          toFind.forEach((valueToFind) => {
+            if (currentValue === valueToFind) accumulator.push(currentIndex);
+          });
           return accumulator;
         },
         new Array<number>()
       );
-
       indexes.push(columnIndexes);
     });
 
@@ -196,6 +203,9 @@ const Minesweeper = (): JSX.Element => {
           setAccumulatorMatrixTrigger(false);
         }
       }, 100);
+
+      // Função retornada no useEffect:
+      // https://www.knowledgehut.com/blog/web-development/how-to-use-react-useeffect
       return function cleanup() {
         clearInterval(timerId);
       };
@@ -213,6 +223,11 @@ const Minesweeper = (): JSX.Element => {
       (x) => new Array(inputRow).fill(0)
     );
 
+    endValue.current = false;
+    setEmoji(1);
+    startTimer.current = false;
+    timerCentiseconds.current = 0;
+    modalMessage.current = "You win!";
     setModalNotOpened(true);
     accumulatorMatrix.current = new Array<Array<Array<number>>>();
     counter.current = 0;
@@ -307,6 +322,7 @@ const Minesweeper = (): JSX.Element => {
   }
 
   function fieldLeftClick(event: React.MouseEvent<HTMLButtonElement>): void {
+    startTimer.current = true;
     let coordinates: Array<number> = getCoordinatesById(event, "mm ");
 
     findNearEmptyFields(coordinates);
@@ -315,6 +331,9 @@ const Minesweeper = (): JSX.Element => {
     let currentMaskingMatrix = setLogicMatrixToMaskingMatrix(logicMatrix);
 
     setHelpMatrixView(coordinates, currentMaskingMatrix);
+
+    endValue.current = checkEnd(currentMaskingMatrix);
+    if (endValue.current) startTimer.current = false;
   }
 
   function fieldRightClick(
@@ -329,15 +348,17 @@ const Minesweeper = (): JSX.Element => {
 
     setMaskingMatrix([...maskingMatrix]);
 
-    flagIndexes.current = findIndexes(maskingMatrix, "F");
+    flagIndexes.current = findIndexes(maskingMatrix, ["F"]);
     setHelpMatrixView(coordinates, maskingMatrix);
+
+    endValue.current = checkEnd(maskingMatrix);
+    if (endValue.current) startTimer.current = false;
   }
 
   let checkEnd = (maskingMatrix: Array<Array<string>>): boolean => {
-    const clickedMineField: Array<Array<number>> = findIndexes(
-      maskingMatrix,
-      "M"
-    );
+    const clickedMineField: Array<Array<number>> = findIndexes(maskingMatrix, [
+      "M",
+    ]);
 
     // Tutorial para uso do every:
     // https://masteringjs.io/tutorials/fundamentals/foreach-break
@@ -348,28 +369,23 @@ const Minesweeper = (): JSX.Element => {
         })
       )
     ) {
-      modalMessage = "Booom!";
+      modalMessage.current = "Booom!";
+      setEmoji(3);
       return true;
     }
 
-    const undiscoveredFields: Array<Array<number>> = findIndexes(
+    const undiscoveredAndFlagsFields: Array<Array<number>> = findIndexes(
       maskingMatrix,
-      " "
-    );
-
-    let anyUndiscoveredField: boolean = !undiscoveredFields.every((column) =>
-      column.every((content) => {
-        return content || content === 0 ? false : true;
-      })
+      [" ", "F"]
     );
 
     if (
       JSON.stringify(mineIndexes.current) ===
-        JSON.stringify(flagIndexes.current) &&
-      !anyUndiscoveredField
-    )
+      JSON.stringify(undiscoveredAndFlagsFields)
+    ) {
+      setEmoji(4);
       return true;
-    else return false;
+    } else return false;
   };
 
   function fieldHighlight(
@@ -398,52 +414,54 @@ const Minesweeper = (): JSX.Element => {
     coordinates: Array<number>,
     currentMaskingMatrix: Array<Array<string>>
   ) {
-    let tempMatrix: Array<Array<string>> = Array.from({ length: 3 }, (x) =>
-      new Array(3).fill(null)
-    );
+    if (showOtherMatrixes) {
+      let tempMatrix: Array<Array<string>> = Array.from({ length: 3 }, (x) =>
+        new Array(3).fill(null)
+      );
 
-    for (let y = -1; y < 2; y++) {
-      for (let x = -1; x < 2; x++) {
-        if (
-          currentMaskingMatrix[coordinates[0] + y] !== undefined &&
-          currentMaskingMatrix[coordinates[0] + y][coordinates[1] + x] !==
-            undefined
-        ) {
-          tempMatrix[y + 1][x + 1] =
-            currentMaskingMatrix[coordinates[0] + y][coordinates[1] + x];
+      for (let y = -1; y < 2; y++) {
+        for (let x = -1; x < 2; x++) {
+          if (
+            currentMaskingMatrix[coordinates[0] + y] !== undefined &&
+            currentMaskingMatrix[coordinates[0] + y][coordinates[1] + x] !==
+              undefined
+          ) {
+            tempMatrix[y + 1][x + 1] =
+              currentMaskingMatrix[coordinates[0] + y][coordinates[1] + x];
+          }
         }
       }
+
+      let notDiscoveredFields: number = 0;
+      let flagFields: number = 0;
+      let minesQuantity: number = parseInt(tempMatrix[1][1]);
+
+      tempMatrix.forEach((array) => {
+        notDiscoveredFields += array.reduce((accumulator, currentValue) => {
+          if (currentValue === " ") return (accumulator += 1);
+          else return accumulator;
+        }, 0);
+        flagFields += array.reduce((accumulator, currentValue) => {
+          if (currentValue === "F") return (accumulator += 1);
+          else return accumulator;
+        }, 0);
+      });
+
+      binaryPossibilitiesValue.current = binaryPossibilities(
+        minesQuantity - flagFields,
+        notDiscoveredFields
+      );
+
+      tempMatrix = tempMatrix.map((array) =>
+        array.map((value) => {
+          if (value === " " && binaryPossibilitiesValue.current.length !== 0) {
+            return binaryPossibilitiesValue.current.length === 1 ? "X" : "?";
+          } else return value;
+        })
+      );
+
+      setHelpMatrix(tempMatrix);
     }
-
-    let notDiscoveredFields: number = 0;
-    let flagFields: number = 0;
-    let minesQuantity: number = parseInt(tempMatrix[1][1]);
-
-    tempMatrix.forEach((array) => {
-      notDiscoveredFields += array.reduce((accumulator, currentValue) => {
-        if (currentValue === " ") return (accumulator += 1);
-        else return accumulator;
-      }, 0);
-      flagFields += array.reduce((accumulator, currentValue) => {
-        if (currentValue === "F") return (accumulator += 1);
-        else return accumulator;
-      }, 0);
-    });
-
-    binaryPossibilitiesValue.current = binaryPossibilities(
-      minesQuantity - flagFields,
-      notDiscoveredFields
-    );
-
-    tempMatrix = tempMatrix.map((array) =>
-      array.map((value) => {
-        if (value === " " && binaryPossibilitiesValue.current.length !== 0) {
-          return binaryPossibilitiesValue.current.length === 1 ? "X" : "?";
-        } else return value;
-      })
-    );
-
-    setHelpMatrix(tempMatrix);
   }
 
   const binaryPossibilities = (
@@ -486,14 +504,32 @@ const Minesweeper = (): JSX.Element => {
 
   return (
     <>
-      {checkEnd(maskingMatrix) && modalNotOpened && (
+      {endValue.current && modalNotOpened && (
         <Modal
-          PrimaryButtonOnClick={() => {
+          primaryButtonOnClick={() => {
             setModalNotOpened(false);
           }}
-          Header="Minesweeper"
-          Content={modalMessage}
-        />
+          header="Minesweeper"
+        >
+          <span>{modalMessage.current}</span>
+          <S.TimerDiv>
+            Time (h : m : s)
+            <div>
+              <span>
+                {Math.floor((timerCentiseconds.current % 8640000) / 360000)}
+              </span>
+              :
+              <span>
+                {Math.floor((timerCentiseconds.current % 360000) / 6000)}
+              </span>
+              :
+              <span>
+                {Math.floor((timerCentiseconds.current % 6000) / 100)}
+              </span>
+              .<span>{Math.floor(timerCentiseconds.current % 100)}</span>
+            </div>
+          </S.TimerDiv>
+        </Modal>
       )}
       <Page
         title={"Minesweeper"}
@@ -501,7 +537,13 @@ const Minesweeper = (): JSX.Element => {
         width={pageWidth}
       >
         <S.WrapperDiv>
-          <Toggle onClick={() => setShowOtherMatrixes(!showOtherMatrixes)}>
+          {/* Bom exemplo de useCallback com dependência */}
+          <Toggle
+            onClick={useCallback(
+              () => setShowOtherMatrixes(!showOtherMatrixes),
+              [showOtherMatrixes]
+            )}
+          >
             Only game
           </Toggle>
         </S.WrapperDiv>
@@ -531,7 +573,14 @@ const Minesweeper = (): JSX.Element => {
             Quantity (%)
           </MinesInputNumber>
           <MinesInputNumber
-            onChange={changeZoomMatrix}
+            onChange={useCallback(
+              (event: React.ChangeEvent<HTMLInputElement>) => {
+                if (event?.target.value) {
+                  setZoomMatrix((event?.target.valueAsNumber / 100).toString());
+                }
+              },
+              []
+            )}
             defaultValue={100}
             min={1}
             max={100}
@@ -540,7 +589,6 @@ const Minesweeper = (): JSX.Element => {
           </MinesInputNumber>
         </S.WrapperDiv>
         <S.ButtonWrapperDiv>
-          <Button onClick={generateMinesweeper}>New Game</Button>
           <Button onClick={startReplay}>
             Replay calculations:
             <S.ReplaySpan>{`${counter.current} / ${accumulatorMatrix.current.length}`}</S.ReplaySpan>
@@ -553,8 +601,56 @@ const Minesweeper = (): JSX.Element => {
               fieldLeftClick={fieldLeftClick}
               fieldRightClick={fieldRightClick}
               fieldHighligh={fieldHighlightProps}
+              onMouseDown={() => setEmoji(2)}
+              onMouseUp={() => setEmoji(1)}
             >
-              Game
+              <S.GameHeader>
+                <S.FlagHeader>
+                  <FaFlag />
+                  <span>
+                    {flagIndexes.current.reduce(
+                      (accumulator, currentValue) =>
+                        (accumulator += currentValue.length),
+                      0
+                    )}
+                  </span>
+                </S.FlagHeader>
+                <S.ButtonHeader onClick={generateMinesweeper}>
+                  {emoji === 1 ? (
+                    <TbMoodSmileBeam
+                      size="33px"
+                      fill="#53B6EA"
+                      strokeWidth="1"
+                    />
+                  ) : emoji === 2 ? (
+                    <TbMoodSuprised
+                      size="33px"
+                      fill="#53B6EA"
+                      strokeWidth="1"
+                    />
+                  ) : emoji === 3 ? (
+                    <TbMoodSadDizzy
+                      size="33px"
+                      fill="#53B6EA"
+                      strokeWidth="1"
+                    />
+                  ) : (
+                    <TbMoodTongueWink2
+                      size="33px"
+                      fill="#53B6EA"
+                      strokeWidth="1"
+                    />
+                  )}
+
+                  <span>New</span>
+                </S.ButtonHeader>
+                {/* Bom exemplo do conceito "Lifting State Up", pois a variável timer está no pai, porém quem modificar é o filho (é assim, pois o pai precisa dessa valor de volta)
+                https://www.freecodecamp.org/news/what-is-lifting-state-up-in-react/ */}
+                <MinesTimer
+                  start={startTimer.current}
+                  timerCentiseconds={timerCentiseconds}
+                ></MinesTimer>
+              </S.GameHeader>
             </MinesDivMatrix>
             {showOtherMatrixes && (
               <S.HelpMatrixWrapperDiv>

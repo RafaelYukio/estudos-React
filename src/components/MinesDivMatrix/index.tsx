@@ -22,6 +22,10 @@ interface DivMatrixMinesProps<T> {
   fieldRightClick?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
+  onMouseDown?: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => void;
+  onMouseUp?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   fieldHighligh?: FieldHighlighProp;
   fieldRefs?: FieldRefs;
   children: React.ReactNode;
@@ -33,6 +37,8 @@ const MinesDivMatrix = <T,>({
   matrix,
   fieldLeftClick,
   fieldRightClick,
+  onMouseDown,
+  onMouseUp,
   fieldHighligh,
   fieldRefs,
   children,
@@ -61,6 +67,12 @@ const MinesDivMatrix = <T,>({
                 }}
                 onContextMenu={(event) => {
                   if (fieldRightClick !== undefined) fieldRightClick(event);
+                }}
+                onMouseDown={(event) => {
+                  if (onMouseDown !== undefined) onMouseDown(event);
+                }}
+                onMouseUp={(event) => {
+                  if (onMouseUp !== undefined) onMouseUp(event);
                 }}
                 key={`mm ${columnIndex} ${rowIndex}`}
                 id={`mm ${columnIndex} ${rowIndex}`}

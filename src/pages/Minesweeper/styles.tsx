@@ -25,7 +25,7 @@ export const HelpMatrixWrapperDiv = styled.div`
 `;
 
 export const HelpPossibilitiesDiv = styled.div`
-  height: 140px;
+  height: 215px;
   width: 210px;
   margin: 0 10px 10px 10px;
   padding: 20px;
@@ -39,4 +39,45 @@ export const HelpPossibilitiesDiv = styled.div`
 
 export const HelpPossibilitiesSpan = styled.span`
   widht: 100%;
+`;
+
+export const GameHeader = styled.div`
+  flex-direction: row;
+  padding: 10px;
+  background-color: #f0f0f0;
+  box-shadow: 0 0 7px 7px #f9f9f9;
+  border-radius: 7px;
+  font-size: 14px;
+`;
+
+export const ButtonHeader = styled.button`
+  border: none;
+  box-shadow: 0 0 7px 7px #ececec inset;
+  padding: 10px 20px;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  gap: 5px;
+`;
+
+export const TimerDiv = styled.div`
+  margin: 20px;
+  div {
+    flex-direction: row;
+  }
+
+  span {
+    margin: 10px 5px;
+  }
+`;
+
+export const FlagHeader = styled.div`
+  flex-direction: row;
+
+  span {
+    width: 40px;
+    text-align: center;
+  }
 `;

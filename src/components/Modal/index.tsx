@@ -3,34 +3,34 @@ import Button from "../Button";
 import * as S from "./style";
 
 interface Props {
-  PrimaryButtonOnClick: (
+  primaryButtonOnClick: (
     event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
-  SecondaryButtonOnClick?: (
+  secondaryButtonOnClick?: (
     event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
-  Header: string;
-  Content: string;
-  Footer?: string;
+  header: string;
+  footer?: string;
+  children: React.ReactNode;
 }
 
 const Modal = ({
-  PrimaryButtonOnClick,
-  SecondaryButtonOnClick,
-  Header,
-  Content,
-  Footer,
+  primaryButtonOnClick,
+  secondaryButtonOnClick,
+  header,
+  footer,
+  children,
 }: Props): JSX.Element => {
   return (
     <S.ModalWrapperDiv>
       <S.ModalDiv>
-        <S.ModalHeaderDiv>{Header}</S.ModalHeaderDiv>
-        <S.ModalContentDiv>{Content}</S.ModalContentDiv>
+        <S.ModalHeaderDiv>{header}</S.ModalHeaderDiv>
+        <S.ModalContentDiv>{children}</S.ModalContentDiv>
         <S.ModalFooterDiv>
-          {Footer}
-          <Button onClick={PrimaryButtonOnClick}>Fechar</Button>
-          {SecondaryButtonOnClick && (
-            <Button onClick={SecondaryButtonOnClick}>Fechar</Button>
+          {footer}
+          <Button onClick={primaryButtonOnClick}>Fechar</Button>
+          {secondaryButtonOnClick && (
+            <Button onClick={secondaryButtonOnClick}>Fechar</Button>
           )}
         </S.ModalFooterDiv>
       </S.ModalDiv>
