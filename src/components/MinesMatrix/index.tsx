@@ -33,7 +33,7 @@ interface Props<T> {
 
 // Função com tipo genérico:
 // https://stackoverflow.com/questions/53958028/how-to-use-generics-in-props-in-react-in-a-functional-component
-const MinesDivMatrix = <T,>({
+const MinesMatrix = <T,>({
   matrix,
   fieldLeftClick,
   fieldRightClick,
@@ -96,4 +96,4 @@ const MinesDivMatrix = <T,>({
 };
 
 // Como os sets estão no componente pai, usando o React.memo, este componente sabe que não precisa se rerenderizar lá
-export default React.memo(MinesDivMatrix);
+export default React.memo(MinesMatrix);

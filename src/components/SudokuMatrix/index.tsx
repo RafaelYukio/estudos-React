@@ -15,7 +15,7 @@ interface Props {
     rowIndex: number) => void;
 }
 
-const SudokuDivMatrix = ({ matrix, setMatrix, scrollWheelField }: Props) => {
+const SudokuMatrix = ({ matrix, setMatrix, scrollWheelField }: Props) => {
   const fieldRefs: FieldRefs = useRef<FieldRefs>({});
 
     // Remover refs se não necessário
@@ -77,4 +77,4 @@ const SudokuDivMatrix = ({ matrix, setMatrix, scrollWheelField }: Props) => {
   );
 };
 
-export default React.memo(SudokuDivMatrix);
+export default React.memo(SudokuMatrix);

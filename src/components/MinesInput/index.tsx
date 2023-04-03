@@ -10,7 +10,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const MinesInputNumber = ({
+const MinesInput = ({
   inputRef,
   defaultValue,
   onChange,
@@ -35,4 +35,4 @@ const MinesInputNumber = ({
   );
 };
 
-export default React.memo(MinesInputNumber);
+export default React.memo(MinesInput);

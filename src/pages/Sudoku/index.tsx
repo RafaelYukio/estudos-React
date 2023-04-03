@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Page from "../../components/Page";
 import * as S from "./style";
 import { PageWidthContext } from "../../contexts/PageWidth";
-import SudokuDivMatrix from "../../components/SudokuDivMatrix";
+import SudokuMatrix from "../../components/SudokuMatrix";
 
 const Sudoku = (): JSX.Element => {
   const { pageWidth } = useContext(PageWidthContext);
@@ -40,11 +40,11 @@ const Sudoku = (): JSX.Element => {
   return (
     <Page title="Sudoku" description="Sudoku" width={pageWidth}>
       Sudoku em construção
-      <SudokuDivMatrix
+      <SudokuMatrix
         matrix={matrix}
         setMatrix={setMatrix}
         scrollWheelField={scrollWheelField}
-      ></SudokuDivMatrix>
+      ></SudokuMatrix>
     </Page>
   );
 };

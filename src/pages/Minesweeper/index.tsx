@@ -8,8 +8,8 @@ import React, {
   useState,
 } from "react";
 import Button from "../../components/Button";
-import MinesDivMatrix from "../../components/MinesDivMatrix";
-import MinesInputNumber from "../../components/MinesInputNumber";
+import MinesMatrix from "../../components/MinesMatrix";
+import MinesInput from "../../components/MinesInput";
 import Modal from "../../components/Modal";
 import Page from "../../components/Page";
 import Toggle from "../../components/Toggle";
@@ -548,31 +548,31 @@ const Minesweeper = (): JSX.Element => {
           </Toggle>
         </S.WrapperDiv>
         <S.WrapperDiv>
-          <MinesInputNumber
+          <MinesInput
             inputRef={inputRefRow}
             defaultValue={6}
             min={1}
             max={50}
           >
             Rows
-          </MinesInputNumber>
-          <MinesInputNumber
+          </MinesInput>
+          <MinesInput
             inputRef={inputRefColumn}
             defaultValue={6}
             min={1}
             max={50}
           >
             Columns
-          </MinesInputNumber>
-          <MinesInputNumber
+          </MinesInput>
+          <MinesInput
             inputRef={inputRefQuantity}
             defaultValue={15}
             min={0}
             max={100}
           >
             Quantity (%)
-          </MinesInputNumber>
-          <MinesInputNumber
+          </MinesInput>
+          <MinesInput
             onChange={useCallback(
               (event: React.ChangeEvent<HTMLInputElement>) => {
                 if (event?.target.value) {
@@ -586,7 +586,7 @@ const Minesweeper = (): JSX.Element => {
             max={100}
           >
             Zoom (%)
-          </MinesInputNumber>
+          </MinesInput>
         </S.WrapperDiv>
         <S.ButtonWrapperDiv>
           <Button onClick={startReplay}>
@@ -596,7 +596,7 @@ const Minesweeper = (): JSX.Element => {
         </S.ButtonWrapperDiv>
         <S.MinesWrapper zoom={zoomMatrix}>
           <S.WrapperDiv>
-            <MinesDivMatrix
+            <MinesMatrix
               matrix={maskingMatrix}
               fieldLeftClick={fieldLeftClick}
               fieldRightClick={fieldRightClick}
@@ -651,12 +651,12 @@ const Minesweeper = (): JSX.Element => {
                   timerCentiseconds={timerCentiseconds}
                 ></MinesTimer>
               </S.GameHeader>
-            </MinesDivMatrix>
+            </MinesMatrix>
             {showOtherMatrixes && (
               <S.HelpMatrixWrapperDiv>
-                <MinesDivMatrix matrix={helpMatrix}>
+                <MinesMatrix matrix={helpMatrix}>
                   Help matrix:
-                </MinesDivMatrix>
+                </MinesMatrix>
                 <S.HelpPossibilitiesDiv>
                   <S.HelpPossibilitiesSpan>
                     {`Possibilities: ${binaryPossibilitiesValue.current.length}`}
@@ -673,18 +673,18 @@ const Minesweeper = (): JSX.Element => {
           </S.WrapperDiv>
           {showOtherMatrixes && (
             <S.WrapperDiv>
-              <MinesDivMatrix
+              <MinesMatrix
                 matrix={onlyMinesMatrix}
                 fieldRefs={onlyMinesMatrixRefs}
               >
                 Matrix with mines (9):
-              </MinesDivMatrix>
-              <MinesDivMatrix matrix={matrix} fieldRefs={matrixRefs}>
+              </MinesMatrix>
+              <MinesMatrix matrix={matrix} fieldRefs={matrixRefs}>
                 Matrix with clues (1~8):
-              </MinesDivMatrix>
-              <MinesDivMatrix matrix={logicMatrix} fieldRefs={logicMatrixRefs}>
+              </MinesMatrix>
+              <MinesMatrix matrix={logicMatrix} fieldRefs={logicMatrixRefs}>
                 Logic matrix (10 = surroundings checked)
-              </MinesDivMatrix>
+              </MinesMatrix>
             </S.WrapperDiv>
           )}
         </S.MinesWrapper>
