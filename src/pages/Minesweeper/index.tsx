@@ -590,7 +590,7 @@ const Minesweeper = (): JSX.Element => {
         </S.WrapperDiv>
         <S.ButtonWrapperDiv>
           <Button onClick={startReplay}>
-            Replay calculations:
+            Replay:
             <S.ReplaySpan>{`${counter.current} / ${accumulatorMatrix.current.length}`}</S.ReplaySpan>
           </Button>
         </S.ButtonWrapperDiv>

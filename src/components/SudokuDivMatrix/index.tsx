@@ -1,43 +1,24 @@
 import React, { useRef, useState } from "react";
 import * as S from "./style";
 
-const SudokuDivMatrix = () => {
-  const [matrix, setMatrix] = useState<Array<Array<Array<Array<number>>>>>(
-    Array.from({ length: 3 }, (x) =>
-      Array.from({ length: 3 }, (x) =>
-        Array.from({ length: 3 }, (x) => new Array(3).fill(0))
-      )
-    )
-  );
-  interface FieldRefs {
-    [key: string]: any;
-  }
+interface FieldRefs {
+  [key: string]: any;
+}
 
-  const fieldRefs: FieldRefs = useRef<FieldRefs>({});
-
-  function scrollWheelField(
-    event: React.WheelEvent<HTMLInputElement>,
+interface Props {
+  matrix: Array<Array<Array<Array<number>>>>;
+  setMatrix: React.Dispatch<React.SetStateAction<number[][][][]>>;
+  scrollWheelField: ( event: React.WheelEvent<HTMLInputElement>,
     columnMatrixIndex: number,
     matrixIndex: number,
     columnIndex: number,
-    rowIndex: number
-  ) {
-    let target = event.target as HTMLInputElement;
+    rowIndex: number) => void;
+}
 
-    if (event.deltaY < 0) {
-      if (target.value === "") target.valueAsNumber = 1;
-      else if (target.valueAsNumber < 9) target.valueAsNumber++;
-    } else if (target.valueAsNumber !== 0) target.valueAsNumber--;
+const SudokuDivMatrix = ({ matrix, setMatrix, scrollWheelField }: Props) => {
+  const fieldRefs: FieldRefs = useRef<FieldRefs>({});
 
-    matrix[columnMatrixIndex][matrixIndex][columnIndex][rowIndex] =
-      target.valueAsNumber;
-
-    console.log(matrix[columnMatrixIndex][matrixIndex][columnIndex][rowIndex]);
-    console.log(matrix);
-    setMatrix(matrix);
-  }
-
-  // Remover refs se não necessário
+    // Remover refs se não necessário
 
   return (
     <S.MatrixRowWrapperDiv>

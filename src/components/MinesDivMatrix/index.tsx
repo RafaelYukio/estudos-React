@@ -14,7 +14,7 @@ interface FieldHighlighProp {
   cssOnMouseEnter: string;
   cssOnMouseLeave: string;
 }
-interface DivMatrixMinesProps<T> {
+interface Props<T> {
   matrix: Array<Array<T>>;
   fieldLeftClick?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -42,7 +42,7 @@ const MinesDivMatrix = <T,>({
   fieldHighligh,
   fieldRefs,
   children,
-}: DivMatrixMinesProps<T>): JSX.Element => {
+}: Props<T>): JSX.Element => {
   return (
     <S.MatrixWrapperDiv>
       {children}
