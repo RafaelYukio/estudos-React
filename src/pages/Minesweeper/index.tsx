@@ -206,7 +206,7 @@ const Minesweeper = (): JSX.Element => {
 
       // Função retornada no useEffect:
       // https://www.knowledgehut.com/blog/web-development/how-to-use-react-useeffect
-      return function cleanup() {
+      return function cleanup(): void {
         clearInterval(timerId);
       };
     }
@@ -413,7 +413,7 @@ const Minesweeper = (): JSX.Element => {
   function setHelpMatrixView(
     coordinates: Array<number>,
     currentMaskingMatrix: Array<Array<string>>
-  ) {
+  ): void {
     if (showOtherMatrixes) {
       let tempMatrix: Array<Array<string>> = Array.from({ length: 3 }, (x) =>
         new Array(3).fill(null)
@@ -547,47 +547,7 @@ const Minesweeper = (): JSX.Element => {
             Only game
           </Toggle>
         </S.WrapperDiv>
-        <S.WrapperDiv>
-          <MinesInput
-            inputRef={inputRefRow}
-            defaultValue={6}
-            min={1}
-            max={50}
-          >
-            Rows
-          </MinesInput>
-          <MinesInput
-            inputRef={inputRefColumn}
-            defaultValue={6}
-            min={1}
-            max={50}
-          >
-            Columns
-          </MinesInput>
-          <MinesInput
-            inputRef={inputRefQuantity}
-            defaultValue={15}
-            min={0}
-            max={100}
-          >
-            Quantity (%)
-          </MinesInput>
-          <MinesInput
-            onChange={useCallback(
-              (event: React.ChangeEvent<HTMLInputElement>) => {
-                if (event?.target.value) {
-                  setZoomMatrix((event?.target.valueAsNumber / 100).toString());
-                }
-              },
-              []
-            )}
-            defaultValue={100}
-            min={1}
-            max={100}
-          >
-            Zoom (%)
-          </MinesInput>
-        </S.WrapperDiv>
+        <S.WrapperDiv></S.WrapperDiv>
         <S.ButtonWrapperDiv>
           <Button onClick={startReplay}>
             Replay:
@@ -596,6 +556,49 @@ const Minesweeper = (): JSX.Element => {
         </S.ButtonWrapperDiv>
         <S.MinesWrapper zoom={zoomMatrix}>
           <S.WrapperDiv>
+            {showOtherMatrixes && (
+              <S.MenuWrapperDiv>
+                <MinesInput
+                  inputRef={inputRefRow}
+                  defaultValue={6}
+                  min={1}
+                  max={50}
+                >
+                  Rows
+                </MinesInput>
+                <MinesInput
+                  inputRef={inputRefColumn}
+                  defaultValue={6}
+                  min={1}
+                  max={50}
+                >
+                  Columns
+                </MinesInput>
+                <MinesInput
+                  inputRef={inputRefQuantity}
+                  defaultValue={15}
+                  min={0}
+                  max={100}
+                >
+                  Quantity (%)
+                </MinesInput>
+                <MinesInput
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    if (event?.target.value) {
+                      setZoomMatrix(
+                        (event?.target.valueAsNumber / 100).toString()
+                      );
+                    }
+                  }}
+                  defaultValue={100}
+                  min={1}
+                  max={100}
+                >
+                  Zoom (%)
+                </MinesInput>
+              </S.MenuWrapperDiv>
+            )}
+
             <MinesMatrix
               matrix={maskingMatrix}
               fieldLeftClick={fieldLeftClick}
@@ -654,9 +657,7 @@ const Minesweeper = (): JSX.Element => {
             </MinesMatrix>
             {showOtherMatrixes && (
               <S.HelpMatrixWrapperDiv>
-                <MinesMatrix matrix={helpMatrix}>
-                  Help matrix:
-                </MinesMatrix>
+                <MinesMatrix matrix={helpMatrix}>Help matrix:</MinesMatrix>
                 <S.HelpPossibilitiesDiv>
                   <S.HelpPossibilitiesSpan>
                     {`Possibilities: ${binaryPossibilitiesValue.current.length}`}

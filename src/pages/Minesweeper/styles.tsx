@@ -20,6 +20,18 @@ export const ReplaySpan = styled.span`
   width: 70px;
 `;
 
+export const MenuWrapperDiv = styled.div`
+  height: 453px;
+  width: 210px;
+  margin: 10px 10px 10px 0;
+  padding: 20px;
+  flex-direction: column;
+  justify-content: start;
+  box-shadow: 0 0 7px 7px #f9f9f9;
+  border-radius: 7px;
+  font-size: 14px;
+`;
+
 export const HelpMatrixWrapperDiv = styled.div`
   width: auto;
 `;

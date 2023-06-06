@@ -21,7 +21,7 @@ const Sudoku = (): JSX.Element => {
     matrixIndex: number,
     columnIndex: number,
     rowIndex: number
-  ) {
+  ): void {
     let target = event.target as HTMLInputElement;
 
     if (event.deltaY < 0) {

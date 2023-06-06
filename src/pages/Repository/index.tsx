@@ -81,7 +81,7 @@ const Home = (): JSX.Element => {
     }
   }
 
-  async function fileDirOnClick(dataFile: DataFile) {
+  async function fileDirOnClick(dataFile: DataFile): Promise<void> {
     if (dataFile.type === "dir") {
       directoryPath.current = directoryPath.current.concat(dataFile.name);
       await getTree();
@@ -92,7 +92,7 @@ const Home = (): JSX.Element => {
     }
   }
 
-  async function backDirOnClick(path?: string) {
+  async function backDirOnClick(path?: string): Promise<void> {
     if (!path) directoryPath.current = [""];
     else {
       let pathIndex = directoryPath.current.findIndex(
