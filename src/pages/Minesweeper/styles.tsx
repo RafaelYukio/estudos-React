@@ -23,7 +23,7 @@ export const ReplaySpan = styled.span`
 export const MenuWrapperDiv = styled.div`
   height: 453px;
   width: 210px;
-  margin: 10px 10px 10px 0;
+  margin: 10px;
   padding: 20px;
   flex-direction: column;
   justify-content: start;
@@ -52,6 +52,12 @@ export const HelpPossibilitiesDiv = styled.div`
 export const HelpPossibilitiesSpan = styled.span`
   widht: 100%;
 `;
+
+export const OtherMatrixesWrapperDiv = styled.span`
+  display: flex;
+  flex-direction: row;
+  margin-left: 12px;
+`
 
 export const GameHeader = styled.div`
   flex-direction: row;

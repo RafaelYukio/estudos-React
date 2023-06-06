@@ -533,7 +533,7 @@ const Minesweeper = (): JSX.Element => {
       )}
       <Page
         title={"Minesweeper"}
-        description={"100% handmade XD"}
+        description={"Escolha as opções de jogo no menu lateral e tenha a possibilidade de esconder as outras matrizes e dar replay nas jogadas."}
         width={pageWidth}
       >
         <S.WrapperDiv>
@@ -673,7 +673,7 @@ const Minesweeper = (): JSX.Element => {
             )}
           </S.WrapperDiv>
           {showOtherMatrixes && (
-            <S.WrapperDiv>
+            <S.OtherMatrixesWrapperDiv>
               <MinesMatrix
                 matrix={onlyMinesMatrix}
                 fieldRefs={onlyMinesMatrixRefs}
@@ -686,7 +686,7 @@ const Minesweeper = (): JSX.Element => {
               <MinesMatrix matrix={logicMatrix} fieldRefs={logicMatrixRefs}>
                 Logic matrix (10 = surroundings checked)
               </MinesMatrix>
-            </S.WrapperDiv>
+            </S.OtherMatrixesWrapperDiv>
           )}
         </S.MinesWrapper>
       </Page>

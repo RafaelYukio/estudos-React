@@ -19,6 +19,7 @@ export const HeaderDiv = styled.div`
 
 export const ContentDiv = styled.div`
   padding: 20px 0 80px 0;
+  margin: 20px;
   border-radius: 10px;
   overflow-x: scroll;
   background-color: white;
