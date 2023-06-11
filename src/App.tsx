@@ -19,7 +19,7 @@ function App() {
   // Uso de context com useMemo:
   // https://blog.agney.dev/useMemo-inside-context/
   // https://stackoverflow.com/questions/62230532/is-usememo-required-to-manage-state-via-the-context-api-in-reactjs
-  const [pageWidth, setPageWidth] = useState<string>("85%");
+  const [pageWidth, setPageWidth] = useState<string>("83%");
   const providerPageWidth = useMemo(
     () => ({
       pageWidth,
